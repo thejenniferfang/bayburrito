@@ -102,11 +102,9 @@ function ViewLayer({
       className="absolute inset-0"
       style={{
         opacity: active ? 1 : 0,
-        // "none" (not scale(1)) on the active layer: a lingering transform
-        // creates a compositing context that makes Leaflet tiles paint lazily
-        transform: active ? "none" : "scale(0.985)",
-        transition:
-          "opacity 200ms cubic-bezier(0.23,1,0.32,1), transform 200ms cubic-bezier(0.23,1,0.32,1)",
+        // no transform: avoids a zoom-in entrance and keeps Leaflet tiles
+        // from painting lazily inside a lingering compositing context
+        transition: "opacity 160ms cubic-bezier(0.23,1,0.32,1)",
         pointerEvents: active ? "auto" : "none",
       }}
       aria-hidden={!active}

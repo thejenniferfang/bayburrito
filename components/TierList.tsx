@@ -24,11 +24,11 @@ export default function TierList() {
           return (
             <section
               key={tier}
-              className="grid grid-cols-[2.5rem_1fr] items-center gap-3 border-t border-(--line) py-2 md:grid-cols-[3.5rem_1fr] md:gap-5"
+              className="grid grid-cols-[2.5rem_1fr] items-center gap-3 py-2 md:grid-cols-[3.5rem_1fr] md:gap-5"
             >
               <span
-                className="text-4xl font-bold leading-none md:text-5xl"
-                style={{ color: TIER_COLORS[tier], fontFamily: "var(--font-display)" }}
+                className="text-4xl leading-none md:text-5xl"
+                style={{ color: TIER_COLORS[tier], fontFamily: "var(--font-bitcount)" }}
               >
                 {tier}
               </span>
@@ -43,12 +43,12 @@ export default function TierList() {
                     <button
                       key={b.id}
                       onClick={() => setOpen(b)}
-                      className="pressable flex flex-col items-start rounded-md border border-(--line) bg-(--surface) px-2.5 py-1.5 text-left leading-tight transition-colors duration-200 hover:border-(--salsa)"
+                      className="pressable flex flex-col items-start rounded-md bg-(--salsa) px-2.5 py-1.5 text-left leading-tight transition-opacity duration-200 hover:opacity-90"
                     >
-                      <span className="w-full truncate text-[13px] font-medium text-(--ink)">
+                      <span className="w-full truncate text-[13px] font-medium text-white">
                         {b.taqueria}
                       </span>
-                      <span className="w-full truncate text-[11px] text-(--ink-dim)">
+                      <span className="w-full truncate text-[11px] text-white/75">
                         {b.neighborhood}
                       </span>
                     </button>
