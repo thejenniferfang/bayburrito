@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { AnimatePresence, motion } from "motion/react";
+import { motion } from "motion/react";
 import { TIER_COLORS, type Burrito } from "@/data/burritos";
 import {
   addComment,
@@ -30,17 +30,8 @@ export default function Notebook({ burrito }: { burrito: Burrito }) {
       className="relative h-full overflow-hidden"
       style={{ background: "#9BB7D4" }}
     >
-      {/* concurrent crossfade (no mode="wait"): the wheel sweeps through
-          several burritos per spin and interrupted waits never resolve */}
-      <AnimatePresence initial={false}>
-        <motion.div
-          key={burrito.id}
-          initial={{ opacity: 0, y: 10, filter: "blur(3px)" }}
-          animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-          exit={{ opacity: 0, y: -8, filter: "blur(3px)" }}
-          transition={{ duration: 0.14, ease: [0.23, 1, 0.32, 1] }}
-          className="absolute inset-0 flex gap-6 overflow-hidden px-6 py-3 md:gap-10 md:px-12 md:py-4"
-        >
+      {/* no transition: content swaps instantly as the wheel changes */}
+      <div className="absolute inset-0 flex gap-6 overflow-hidden px-6 py-3 md:gap-10 md:px-12 md:py-4">
           {/* left: place identity + notes */}
           <div className="flex min-w-0 flex-1 flex-col gap-0.5">
             <div className="flex items-start justify-between gap-3">
@@ -85,8 +76,7 @@ export default function Notebook({ burrito }: { burrito: Burrito }) {
             <RatingBar burritoId={burrito.id} />
             <Comments burritoId={burrito.id} />
           </div>
-        </motion.div>
-      </AnimatePresence>
+      </div>
     </div>
   );
 }
@@ -158,7 +148,7 @@ function RatingBar({ burritoId }: { burritoId: string }) {
     <div className="w-full">
       <div className="mb-1 flex items-baseline justify-between">
         <span
-          className="text-sm text-(--paper-ink)/70"
+          className="text-lg text-(--paper-ink)/75"
           style={{ fontFamily: "var(--font-bitcount)" }}
         >
           your rating
@@ -260,7 +250,7 @@ function Comments({ burritoId }: { burritoId: string }) {
                 <span className="min-w-0 truncate font-hand text-xl text-(--paper-ink)/80">
                   {c.text}
                 </span>
-                <span className="shrink-0 text-[10px] uppercase tracking-wider text-(--paper-ink)/40">
+                <span className="shrink-0 font-hand text-base text-(--paper-ink)/45">
                   {timeAgo(c.at)}
                 </span>
               </li>

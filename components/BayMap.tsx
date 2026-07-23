@@ -361,8 +361,13 @@ export default function BayMap({ active = true }: { active?: boolean }) {
       {!searching && (
         <button
           onClick={() => setSearching(true)}
-          className="pressable absolute left-1/2 top-4 z-[1000] -translate-x-1/2 rounded-full bg-(--olive) px-5 py-2 text-xl text-white shadow-[0_8px_24px_rgba(40,28,16,0.3)]"
-          style={{ fontFamily: "var(--font-hand)" }}
+          className="pressable absolute left-1/2 top-4 z-[1000] -translate-x-1/2 rounded-full px-5 py-2 text-xl text-white"
+          style={{
+            fontFamily: "var(--font-hand)",
+            background: "#6e8c3e",
+            boxShadow:
+              "inset 0 1px 0 rgba(255,255,255,0.3), inset 0 -2px 4px rgba(0,0,0,0.22)",
+          }}
         >
           + request a spot for fluffie
         </button>
@@ -370,11 +375,20 @@ export default function BayMap({ active = true }: { active?: boolean }) {
 
       {searching && (
         <div
-          className="absolute left-1/2 top-4 z-[1000] w-[min(92vw,380px)] -translate-x-1/2 rounded-2xl bg-(--surface) p-4 shadow-[0_16px_48px_rgba(40,28,16,0.35)]"
-          style={{ fontFamily: "var(--font-hand)" }}
+          className="absolute left-1/2 top-4 z-[1000] w-[min(92vw,380px)] -translate-x-1/2 rounded-2xl p-4"
+          style={{
+            fontFamily: "var(--font-hand)",
+            background: "#e8e1cd",
+            border: "1px solid rgba(120,95,50,0.18)",
+            boxShadow:
+              "inset 0 1px 0 rgba(255,255,255,0.7), inset 0 -2px 5px rgba(120,95,50,0.14)",
+          }}
         >
           <div className="mb-2 flex items-baseline justify-between">
-            <p className="text-xl leading-none text-(--olive)">
+            <p
+              className="text-xl leading-none text-(--olive)"
+              style={{ textShadow: "0 1px 0 rgba(255,255,255,0.6)" }}
+            >
               request a spot for fluffie
             </p>
             <button
@@ -392,7 +406,11 @@ export default function BayMap({ active = true }: { active?: boolean }) {
               if (e.key === "Enter" && suggestions[0]) pick(suggestions[0]);
             }}
             placeholder="start typing a taqueria..."
-            className="w-full rounded-lg bg-(--bg) px-3 py-2 text-lg text-(--ink) placeholder:text-(--ink-dim)/60 focus:outline-none focus:ring-2 focus:ring-(--olive)"
+            className="w-full rounded-xl border-2 border-transparent px-3 py-2 text-lg text-(--ink) placeholder:text-(--ink-dim)/55 focus:border-(--salsa) focus:outline-none"
+            style={{
+              background: "#f1eacf",
+              boxShadow: "inset 0 2px 4px rgba(120,95,50,0.22)",
+            }}
           />
 
           {/* live suggestions */}
@@ -432,7 +450,11 @@ export default function BayMap({ active = true }: { active?: boolean }) {
             value={note}
             onChange={(e) => setNote(e.target.value)}
             placeholder="why should he go? (optional)"
-            className="mt-2 w-full rounded-lg bg-(--bg) px-3 py-2 text-lg text-(--ink) placeholder:text-(--ink-dim)/60 focus:outline-none focus:ring-2 focus:ring-(--olive)"
+            className="mt-2 w-full rounded-xl border-2 border-transparent px-3 py-2 text-lg text-(--ink) placeholder:text-(--ink-dim)/55 focus:border-(--salsa) focus:outline-none"
+            style={{
+              background: "#f1eacf",
+              boxShadow: "inset 0 2px 4px rgba(120,95,50,0.22)",
+            }}
           />
           <p className="mt-1.5 text-sm text-(--ink-dim)/70">
             pick a match above to add it to the map
@@ -442,8 +464,13 @@ export default function BayMap({ active = true }: { active?: boolean }) {
 
       {/* tier color key */}
       <div
-        className="absolute bottom-6 left-4 z-[900] rounded-lg border border-(--line) bg-(--surface)/95 px-3.5 py-2.5"
-        style={{ fontFamily: "var(--font-hand)" }}
+        className="absolute bottom-6 left-4 z-[900] rounded-lg px-3.5 py-2.5"
+        style={{
+          fontFamily: "var(--font-hand)",
+          background: "#e8e1cd",
+          boxShadow:
+            "inset 0 1px 0 rgba(255,255,255,0.6), inset 0 -2px 4px rgba(120,95,50,0.12)",
+        }}
       >
         <p
           className="mb-1.5 text-base leading-none text-(--ink)/70"

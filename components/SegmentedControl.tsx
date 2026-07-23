@@ -44,7 +44,10 @@ export default function SegmentedControl({
                 transition={{ type: "spring", duration: 0.4, bounce: 0.18 }}
               />
             )}
-            <span className="relative whitespace-nowrap">{opt.label}</span>
+            {/* Bitcount sits high in its line box; nudge down to visually center */}
+            <span className="relative block translate-y-[2px] whitespace-nowrap">
+              {opt.label}
+            </span>
           </button>
         );
       })}
