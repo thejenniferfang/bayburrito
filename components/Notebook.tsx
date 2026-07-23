@@ -53,7 +53,7 @@ export default function Notebook({ burrito }: { burrito: Burrito }) {
                       target="_blank"
                       rel="noreferrer"
                       title="watch the review"
-                      className="underline decoration-(--paper-ink)/25 underline-offset-4 transition-colors duration-150 hover:text-(--salsa)"
+                      className="transition-colors duration-150 hover:text-(--salsa)"
                     >
                       {burrito.taqueria}
                     </a>
@@ -218,7 +218,7 @@ function Comments({ burritoId }: { burritoId: string }) {
             ))}
         </ul>
       )}
-      <div className="flex items-center gap-2 border-b border-(--paper-ink)/30">
+      <div className="flex items-center gap-2 rounded-lg bg-black/5 px-2">
         <input
           value={draft}
           onChange={(e) => setDraft(e.target.value)}

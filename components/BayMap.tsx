@@ -26,10 +26,11 @@ export default function BayMap({ active = true }: { active?: boolean }) {
   const reqLayerRef = useRef<Marker[]>([]);
   const roRef = useRef<ResizeObserver | null>(null);
   const LRef = useRef<typeof import("leaflet") | null>(null);
-  const [placing, setPlacing] = useState(false);
-  const [pending, setPending] = useState<{ lat: number; lng: number } | null>(null);
-  const pendingMarker = useRef<Marker | null>(null);
-  const [form, setForm] = useState({ name: "", neighborhood: "", note: "" });
+  const [searching, setSearching] = useState(false);
+  const [query, setQuery] = useState("");
+  const [note, setNote] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [requests, setRequests] = useState<SpotRequest[]>([]);
 
   // init the map the first time this view opens. Initializing while the
@@ -184,65 +185,68 @@ export default function BayMap({ active = true }: { active?: boolean }) {
     );
   }, [requests]);
 
-  // click-to-place while in "request" mode
-  useEffect(() => {
-    const L = LRef.current;
-    const map = mapRef.current;
-    if (!L || !map) return;
-    const onClick = (e: { latlng: { lat: number; lng: number } }) => {
-      if (!placing) return;
-      const { lat, lng } = e.latlng;
-      setPending({ lat, lng });
-      pendingMarker.current?.remove();
-      pendingMarker.current = L.marker([lat, lng], {
-        icon: L.divIcon({
-          html: pinHtml("#e0356b", true),
-          className: "",
-          iconSize: [26, 34],
-          iconAnchor: [13, 33],
-        }),
-        opacity: 0.7,
-      }).addTo(map);
-    };
-    map.on("click", onClick);
-    return () => {
-      map.off("click", onClick);
-    };
-  }, [placing]);
-
-  const submit = () => {
-    if (!pending || !form.name.trim()) return;
-    const saved = addRequest({
-      name: form.name.trim(),
-      neighborhood: form.neighborhood.trim(),
-      note: form.note.trim(),
-      lat: pending.lat,
-      lng: pending.lng,
-    });
-    setRequests((prev) => [...prev, saved]);
-    pendingMarker.current?.remove();
-    pendingMarker.current = null;
-    setPending(null);
-    setPlacing(false);
-    setForm({ name: "", neighborhood: "", note: "" });
+  // Beli-style: type the place name, we geocode it and drop the pin.
+  const search = async () => {
+    const q = query.trim();
+    if (!q || busy) return;
+    setBusy(true);
+    setError(null);
+    try {
+      // Nominatim matches better on the raw name; only fall back to a
+      // ", California" hint. viewbox biases results toward the Bay Area.
+      const base =
+        "https://nominatim.openstreetmap.org/search?format=json&limit=1&addressdetails=1" +
+        "&viewbox=-122.75,38.1,-121.55,36.85&bounded=0";
+      type Hit = { lat: string; lon: string; address?: Record<string, string> };
+      let hit: Hit | undefined;
+      for (const variant of [q, `${q}, California`]) {
+        const res = await fetch(`${base}&q=${encodeURIComponent(variant)}`, {
+          headers: { Accept: "application/json" },
+        });
+        hit = ((await res.json()) as Hit[])[0];
+        if (hit) break;
+      }
+      if (!hit) {
+        setError("couldn't find that. try adding the city.");
+        setBusy(false);
+        return;
+      }
+      const a = hit.address ?? {};
+      const neighborhood =
+        a.city || a.town || a.suburb || a.neighbourhood || a.county || "";
+      const saved = addRequest({
+        name: q,
+        neighborhood,
+        note: note.trim(),
+        lat: +(+hit.lat).toFixed(5),
+        lng: +(+hit.lon).toFixed(5),
+      });
+      setRequests((prev) => [...prev, saved]);
+      mapRef.current?.setView([+hit.lat, +hit.lon], 14);
+      setQuery("");
+      setNote("");
+      setSearching(false);
+    } catch {
+      setError("search failed, try again");
+    }
+    setBusy(false);
   };
 
   const cancel = () => {
-    pendingMarker.current?.remove();
-    pendingMarker.current = null;
-    setPending(null);
-    setPlacing(false);
-    setForm({ name: "", neighborhood: "", note: "" });
+    setSearching(false);
+    setQuery("");
+    setNote("");
+    setError(null);
   };
 
   return (
     <div className="relative h-full w-full">
       <div ref={holder} className="h-full w-full" />
 
-      {/* request-a-spot control */}
-      {!placing && !pending && (
+      {/* request-a-spot: search by name (we geocode it, Beli-style) */}
+      {!searching && (
         <button
-          onClick={() => setPlacing(true)}
+          onClick={() => setSearching(true)}
           className="pressable absolute left-1/2 top-4 z-[1000] -translate-x-1/2 rounded-full bg-(--olive) px-5 py-2 text-xl text-white shadow-[0_8px_24px_rgba(40,28,16,0.3)]"
           style={{ fontFamily: "var(--font-hand)" }}
         >
@@ -250,66 +254,44 @@ export default function BayMap({ active = true }: { active?: boolean }) {
         </button>
       )}
 
-      {placing && !pending && (
-        <div className="absolute left-1/2 top-4 z-[1000] flex -translate-x-1/2 items-center gap-3 rounded-full border border-(--line) bg-(--surface) px-4 py-2.5 shadow-lg">
-          <span
-            className="text-[12px] font-bold uppercase tracking-[0.1em] text-(--ink)"
-            style={{ fontFamily: "var(--font-mono)" }}
-          >
-            tap the map where it is
-          </span>
-          <button
-            onClick={cancel}
-            className="pressable text-[11px] uppercase tracking-wider text-(--ink-dim) hover:text-(--salsa)"
-          >
-            cancel
-          </button>
-        </div>
-      )}
-
-      {/* request form once a location is chosen */}
-      {pending && (
+      {searching && (
         <div
-          className="absolute left-1/2 top-4 z-[1000] w-[min(90vw,340px)] -translate-x-1/2 rounded-lg border border-(--line) bg-(--surface) p-4 shadow-[0_16px_48px_rgba(40,28,16,0.35)]"
-          style={{ fontFamily: "var(--font-mono)" }}
+          className="absolute left-1/2 top-4 z-[1000] w-[min(92vw,360px)] -translate-x-1/2 rounded-2xl bg-(--surface) p-4 shadow-[0_16px_48px_rgba(40,28,16,0.35)]"
+          style={{ fontFamily: "var(--font-hand)" }}
         >
-          <p className="mb-3 text-[12px] font-bold uppercase tracking-[0.12em] text-(--hotpink)">
-            Request a burrito spot
+          <p className="mb-2 text-xl leading-none text-(--olive)">
+            request a spot for fluffie
           </p>
           <input
             autoFocus
-            value={form.name}
-            onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
-            onKeyDown={(e) => e.key === "Enter" && submit()}
-            placeholder="taqueria name *"
-            className="mb-2 w-full rounded-md border border-(--line) bg-(--bg) px-3 py-2 text-sm text-(--ink) placeholder:text-(--ink-dim)/60 focus:border-(--salsa) focus:outline-none"
+            value={query}
+            onChange={(e) => {
+              setQuery(e.target.value);
+              setError(null);
+            }}
+            onKeyDown={(e) => e.key === "Enter" && search()}
+            placeholder="place name, e.g. La Taqueria SF"
+            className="mb-2 w-full rounded-lg bg-(--bg) px-3 py-2 text-lg text-(--ink) placeholder:text-(--ink-dim)/60 focus:outline-none focus:ring-2 focus:ring-(--olive)"
           />
           <input
-            value={form.neighborhood}
-            onChange={(e) =>
-              setForm((f) => ({ ...f, neighborhood: e.target.value }))
-            }
-            placeholder="neighborhood"
-            className="mb-2 w-full rounded-md border border-(--line) bg-(--bg) px-3 py-2 text-sm text-(--ink) placeholder:text-(--ink-dim)/60 focus:border-(--salsa) focus:outline-none"
-          />
-          <input
-            value={form.note}
-            onChange={(e) => setForm((f) => ({ ...f, note: e.target.value }))}
-            onKeyDown={(e) => e.key === "Enter" && submit()}
+            value={note}
+            onChange={(e) => setNote(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && search()}
             placeholder="why should he go? (optional)"
-            className="mb-3 w-full rounded-md border border-(--line) bg-(--bg) px-3 py-2 text-sm text-(--ink) placeholder:text-(--ink-dim)/60 focus:border-(--salsa) focus:outline-none"
+            className="mb-2 w-full rounded-lg bg-(--bg) px-3 py-2 text-lg text-(--ink) placeholder:text-(--ink-dim)/60 focus:outline-none focus:ring-2 focus:ring-(--olive)"
           />
+          {error && <p className="mb-2 text-base text-(--salsa)">{error}</p>}
           <div className="flex gap-2">
             <button
-              onClick={submit}
-              disabled={!form.name.trim()}
-              className="pressable flex-1 rounded-md bg-(--salsa) py-2 text-[11px] font-bold uppercase tracking-[0.12em] text-white disabled:opacity-40"
+              onClick={search}
+              disabled={!query.trim() || busy}
+              className="pressable flex-1 rounded-lg bg-(--olive) py-2 text-lg text-white disabled:opacity-40"
             >
-              Add to map
+              {busy ? "searching..." : "find it & add"}
             </button>
             <button
               onClick={cancel}
-              className="pressable rounded-md border border-(--line) px-3 py-2 text-[11px] uppercase tracking-wider text-(--ink-dim) hover:text-(--ink)"
+              className="pressable rounded-lg px-3 py-2 text-lg text-(--ink-dim) hover:text-(--ink)"
             >
               cancel
             </button>
