@@ -2,7 +2,7 @@
 
 :root {
   /* warm editorial base (Horses LA chic) */
-  --bg: #f0c05a;
+  --bg: #f7e4a1;
   --bg-warm: #e8d9bd;
   --surface: #f5eeddff;
   --ink: #201a13;
@@ -31,7 +31,7 @@
   /* tier scale: hot -> cool, food-forward */
   --tier-s: #d13a24;
   --tier-a: #e0821e;
-  --tier-b: #cfa42a;
+  --tier-b: #f0c05a;
   --tier-c: #6e8c3e;
   --tier-d: #7b92aa;
   --tier-f: #8f8271;
