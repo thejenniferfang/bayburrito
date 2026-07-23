@@ -43,7 +43,10 @@ export default function Notebook({ burrito }: { burrito: Burrito }) {
           <div className="flex min-w-0 flex-1 flex-col gap-0.5">
             <div className="flex items-start justify-between gap-3">
               <div className="min-w-0">
-                <h2 className="font-hand text-2xl leading-tight text-(--paper-ink) md:text-4xl">
+                <h2
+                  className="text-xl leading-tight text-(--paper-ink) md:text-3xl"
+                  style={{ fontFamily: "var(--font-bitcount)" }}
+                >
                   {burrito.taqueria}
                 </h2>
                 <p className="font-hand text-lg text-(--paper-ink)/60 md:text-xl">
@@ -126,12 +129,21 @@ function RatingBar({ burritoId }: { burritoId: string }) {
   return (
     <div className="w-full">
       <div className="mb-1 flex items-baseline justify-between">
-        <span className="font-hand text-xl text-(--paper-ink)/70">
+        <span
+          className="text-sm text-(--paper-ink)/70"
+          style={{ fontFamily: "var(--font-bitcount)" }}
+        >
           your rating
         </span>
-        <span className="font-hand text-2xl leading-none text-(--salsa)">
+        <motion.span
+          key={value ?? "none"}
+          initial={{ scale: 1.4 }}
+          animate={{ scale: 1 }}
+          transition={{ type: "spring", stiffness: 420, damping: 14 }}
+          className="inline-block font-hand text-2xl leading-none text-(--salsa)"
+        >
           {value === null ? "?" : value}/10
-        </span>
+        </motion.span>
       </div>
       <div
         ref={trackRef}
@@ -161,12 +173,11 @@ function RatingBar({ burritoId }: { burritoId: string }) {
           addRating(burritoId, next);
         }}
       >
-        <div
-          className="absolute inset-0 origin-left bg-(--salsa) transition-transform duration-150"
-          style={{
-            transform: `scaleX(${(value ?? 0) / 10})`,
-            transitionTimingFunction: "cubic-bezier(0.23, 1, 0.32, 1)",
-          }}
+        <motion.div
+          className="absolute inset-0 bg-(--salsa)"
+          style={{ transformOrigin: "left" }}
+          animate={{ transform: `scaleX(${(value ?? 0) / 10})` }}
+          transition={{ type: "spring", stiffness: 300, damping: 20 }}
         />
       </div>
     </div>

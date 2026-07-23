@@ -46,7 +46,10 @@ export default function Home() {
         transition={{ duration: 0.5, ease: [0.23, 1, 0.32, 1] }}
       >
         <header className="grid grid-cols-[1fr_auto_1fr] items-center gap-3 bg-(--bg) px-4 py-3 md:px-8">
-          <h1 className="truncate font-hand text-2xl leading-none text-(--ink) md:text-3xl">
+          <h1
+            className="truncate text-xl leading-none text-(--ink) md:text-2xl"
+            style={{ fontFamily: "var(--font-bitcount)" }}
+          >
             <span className="md:hidden">BBC</span>
             <span className="hidden md:inline">Bay Burrito Challenge</span>
           </h1>

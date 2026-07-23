@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist_Mono, Space_Mono } from "next/font/google";
+import { Bitcount_Prop_Double, Geist_Mono, Space_Mono } from "next/font/google";
 import localFont from "next/font/local";
 import "./globals.css";
 import { AgentationProvider } from "@/components/agentation-provider";
@@ -12,6 +12,12 @@ const geistMono = Geist_Mono({
 const spaceMono = Space_Mono({
   variable: "--font-space-mono",
   weight: ["400", "700"],
+  subsets: ["latin"],
+});
+
+const bitcount = Bitcount_Prop_Double({
+  variable: "--font-bitcount",
+  weight: "400",
   subsets: ["latin"],
 });
 
@@ -34,7 +40,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistMono.variable} ${spaceMono.variable} ${handOfJen.variable} grain antialiased`}
+        className={`${geistMono.variable} ${spaceMono.variable} ${bitcount.variable} ${handOfJen.variable} grain antialiased`}
       >
         {children}
         <AgentationProvider />
