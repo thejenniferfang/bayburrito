@@ -63,32 +63,19 @@ export default function LoadingScreen({ onDone }: { onDone: () => void }) {
       >
         <motion.div
           className="relative h-full w-full"
-          animate={
-            done
-              ? { scale: 0.9, opacity: 0 }
-              : { scale: 1, opacity: 1, y: reduced ? 0 : [0, -7, 0] }
-          }
+          animate={done ? { scale: 0.9, opacity: 0 } : { scale: 1, opacity: 1 }}
           transition={
-            done
-              ? { type: "spring", duration: 0.5, bounce: 0 }
-              : { y: { duration: 3.4, repeat: Infinity, ease: "easeInOut" } }
+            done ? { type: "spring", duration: 0.5, bounce: 0 } : { duration: 0 }
           }
         >
-          {/* crossfade between frames; the burrito is bottom-anchored so it
-              visibly shrinks as it's eaten */}
-          <AnimatePresence initial={false}>
-            <motion.img
-              key={stage}
-              src={STAGES[stage]}
-              alt=""
-              draggable={false}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.14, ease: [0.23, 1, 0.32, 1] }}
-              className="absolute bottom-0 left-1/2 max-h-full w-auto max-w-full -translate-x-1/2 object-contain"
-            />
-          </AnimatePresence>
+          {/* frames swap instantly (no float, no crossfade); bottom-anchored
+              so the burrito just visibly shrinks as it's eaten */}
+          <img
+            src={STAGES[stage]}
+            alt=""
+            draggable={false}
+            className="absolute bottom-0 left-1/2 max-h-full w-auto max-w-full -translate-x-1/2 object-contain"
+          />
         </motion.div>
       </button>
 

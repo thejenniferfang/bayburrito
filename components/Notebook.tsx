@@ -124,7 +124,7 @@ function RatingBar({ burritoId }: { burritoId: string }) {
   };
 
   return (
-    <div className="w-full md:max-w-60">
+    <div className="w-full">
       <div className="mb-1 flex items-baseline justify-between">
         <span className="font-hand text-xl text-(--paper-ink)/70">
           your rating
@@ -141,7 +141,7 @@ function RatingBar({ burritoId }: { burritoId: string }) {
         aria-valuemax={10}
         aria-valuenow={value ?? 0}
         tabIndex={0}
-        className="relative h-4 cursor-pointer touch-none overflow-hidden rounded-sm border border-(--paper-ink)/25 bg-black/10"
+        className="relative h-4 cursor-pointer touch-none overflow-hidden rounded-full border-2 border-black bg-black/10"
         onPointerDown={(e) => {
           dragging.current = true;
           (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
