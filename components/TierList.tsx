@@ -17,17 +17,17 @@ export default function TierList() {
   }, [open]);
 
   return (
-    <div className="h-full overflow-y-auto px-4 py-3 md:px-10">
-      <div className="mx-auto max-w-5xl">
+    <div className="h-full overflow-y-auto px-4 py-2 md:overflow-hidden md:px-10">
+      <div className="mx-auto flex max-w-5xl flex-col md:h-full md:justify-center md:gap-1">
         {TIERS.map((tier) => {
           const entries = BURRITOS.filter((b) => b.tier === tier);
           return (
             <section
               key={tier}
-              className="grid grid-cols-[2.5rem_1fr] items-center gap-3 py-2 md:grid-cols-[3.5rem_1fr] md:gap-5"
+              className="grid grid-cols-[2.25rem_1fr] items-center gap-3 py-1.5 md:grid-cols-[3rem_1fr] md:gap-5 md:py-0"
             >
               <span
-                className="text-4xl leading-none md:text-5xl"
+                className="text-3xl leading-none md:text-4xl"
                 style={{ color: TIER_COLORS[tier], fontFamily: "var(--font-bitcount)" }}
               >
                 {tier}
@@ -38,18 +38,18 @@ export default function TierList() {
                   nothing here yet...
                 </p>
               ) : (
-                <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-4">
+                <div className="grid grid-cols-2 gap-1.5 sm:grid-cols-3 lg:grid-cols-4">
                   {entries.map((b) => (
                     <button
                       key={b.id}
                       onClick={() => setOpen(b)}
                       style={{ background: TIER_COLORS[tier] }}
-                      className="pressable flex flex-col items-start rounded-md px-2.5 py-1.5 text-left leading-tight transition-opacity duration-200 hover:opacity-90"
+                      className="pressable flex flex-col items-start rounded-md px-2.5 py-1 text-left leading-tight transition-opacity duration-200 hover:opacity-90"
                     >
-                      <span className="w-full truncate font-hand text-lg leading-tight text-white">
+                      <span className="w-full truncate font-hand text-base leading-tight text-white">
                         {b.taqueria}
                       </span>
-                      <span className="w-full truncate font-hand text-sm leading-tight text-white/80">
+                      <span className="w-full truncate font-hand text-xs leading-tight text-white/80">
                         {b.neighborhood}
                       </span>
                     </button>
