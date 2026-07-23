@@ -63,11 +63,14 @@ export default function LazySusan({
   }, []);
 
   // big round table, center below the viewport: only the top arc shows.
-  // items ride the rim; the active one sits at the apex (12 o'clock).
-  const R = dims ? Math.min(dims.w * 0.55, dims.h * 0.72) : 0;
-  const cy = dims ? dims.h * 1.12 : 0;
+  // burritos orbit OUTSIDE the table edge (itemR > tableR) so they sit on
+  // the rim and spill toward the viewer, larger than the table surface.
+  const baseR = dims ? Math.min(dims.w * 0.52, dims.h * 0.72) : 0;
+  const tableR = baseR * 1.05;
+  const R = baseR * 1.32; // item orbit radius (beyond the table edge)
+  const cy = dims ? dims.h * 1.16 : 0;
   const itemW = dims
-    ? Math.max(72, Math.min(170, ((2 * Math.PI * R) / n) * 0.66))
+    ? Math.max(120, Math.min(260, ((2 * Math.PI * R) / n) * 0.9))
     : 0;
 
   // report the burrito nearest the front as rotation changes
@@ -181,7 +184,7 @@ export default function LazySusan({
     >
       {/* the table: a full disc whose top arc pokes into view */}
       {dims && (
-        <TableDisc rotation={rotation} R={R} cy={cy} />
+        <TableDisc rotation={rotation} R={tableR} cy={cy} />
       )}
 
       {dims && burritos.map((b, i) => (
@@ -210,7 +213,7 @@ function TableDisc({
   R: number;
   cy: number;
 }) {
-  const Rt = R * 1.34;
+  const Rt = R;
   // the real wood top spins with the burritos, like a true lazy Susan
   const transform = useTransform(
     rotation,

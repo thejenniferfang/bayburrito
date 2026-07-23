@@ -29,8 +29,6 @@ export default function BurritoImage({
           draggable={false}
           className="h-full w-full object-cover"
         />
-        {/* plate rim + vignette so photos sit into the dark table */}
-        <div className="absolute inset-0 rounded-full shadow-[inset_0_0_0_3px_rgba(19,17,16,0.55),inset_0_-14px_28px_rgba(0,0,0,0.45)]" />
       </div>
     </div>
   );
