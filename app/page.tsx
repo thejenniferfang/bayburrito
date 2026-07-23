@@ -73,7 +73,7 @@ export default function Home() {
         <div className="relative min-h-0 flex-1">
           <ViewLayer active={view === "susan"}>
             <div className="flex h-full flex-col">
-              <div className="h-[30%] min-h-0">
+              <div className="h-[25%] min-h-0">
                 <Notebook burrito={active} />
               </div>
               <div className="min-h-0 flex-1">

@@ -65,10 +65,10 @@ export default function LazySusan({
   // big round table, center below the viewport: only the top arc shows.
   // burritos orbit OUTSIDE the table edge (itemR > tableR) so they sit on
   // the rim and spill toward the viewer, larger than the table surface.
-  const baseR = dims ? Math.min(dims.w * 0.52, dims.h * 0.72) : 0;
+  const baseR = dims ? Math.min(dims.w * 0.5, dims.h * 0.66) : 0;
   const tableR = baseR * 1.05;
   const R = baseR * 1.32; // item orbit radius (beyond the table edge)
-  const cy = dims ? dims.h * 1.16 : 0;
+  const cy = dims ? dims.h * 1.24 : 0;
   const itemW = dims
     ? Math.max(120, Math.min(260, ((2 * Math.PI * R) / n) * 0.9))
     : 0;
@@ -268,13 +268,13 @@ function SusanItem({
     // sides of the apex and stays correct after full spins. Using the raw
     // angle made the gaussian favor one side.
     const tw = Math.atan2(Math.sin(theta(r)), Math.cos(theta(r)));
-    // sharp gaussian bump so the apex plate clearly leads even with
-    // 30+ items packed 11 degrees apart
-    const bump = Math.exp(-((tw / 0.35) ** 2));
-    const lift = R + 30 * bump; // apex eases outward off the rim
+    // sharp gaussian bump so the apex plate clearly leads and separates from
+    // its neighbours (sharper = neighbours fall away faster)
+    const bump = Math.exp(-((tw / 0.28) ** 2));
+    const lift = R + 55 * bump; // apex eases outward off the rim, standing proud
     const x = Math.sin(tw) * lift;
     const y = -Math.cos(tw) * lift;
-    const scale = 0.64 + 0.58 * bump;
+    const scale = 0.6 + 0.66 * bump;
     // plates rotate WITH the table (like a real lazy Susan), except near the
     // apex where the hero straightens up to face you. tw is already in
     // [-180, 180] once converted to degrees.
