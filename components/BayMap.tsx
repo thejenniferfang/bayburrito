@@ -14,7 +14,17 @@ import {
 const esc = (s: string) =>
   s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/"/g, "&quot;");
 
-type Suggestion = { name: string; city: string; lat: number; lng: number };
+type Suggestion = {
+  name: string;
+  city: string;
+  lat?: number;
+  lng?: number;
+  mapboxId?: string; // present for Mapbox results; coords fetched on pick
+};
+
+// Mapbox Search Box gives Google-level business coverage; Photon (OSM) is a
+// free fallback if no token is configured.
+const MAPBOX = process.env.NEXT_PUBLIC_MAPBOX_TOKEN;
 
 // Bay Area bounding box (west, east, south, north) for biasing + filtering
 const BAY = { w: -122.75, e: -121.55, s: 36.85, n: 38.1 };
@@ -36,6 +46,7 @@ export default function BayMap({ active = true }: { active?: boolean }) {
   const reqLayerRef = useRef<Marker[]>([]);
   const roRef = useRef<ResizeObserver | null>(null);
   const LRef = useRef<typeof import("leaflet") | null>(null);
+  const sessionRef = useRef<string>(""); // Mapbox Search Box session
   const [searching, setSearching] = useState(false);
   const [query, setQuery] = useState("");
   const [note, setNote] = useState("");
@@ -215,8 +226,8 @@ export default function BayMap({ active = true }: { active?: boolean }) {
     return () => el.removeEventListener("click", onClick);
   }, []);
 
-  // Autocomplete: as you type, suggest Bay Area places (Photon geocoder,
-  // location-biased to SF, filtered to the Bay bounding box).
+  // Autocomplete: suggest Bay Area places as you type. Mapbox Search Box
+  // (business-grade coverage) when a token is set, else Photon (OSM).
   useEffect(() => {
     const q = query.trim();
     if (!searching || q.length < 3) {
@@ -226,35 +237,62 @@ export default function BayMap({ active = true }: { active?: boolean }) {
     setLoadingSug(true);
     const id = setTimeout(async () => {
       try {
-        const res = await fetch(
-          `https://photon.komoot.io/api/?q=${encodeURIComponent(q)}` +
-            "&lat=37.77&lon=-122.42&limit=8&lang=en"
-        );
-        const data = (await res.json()) as {
-          features: Array<{
-            geometry: { coordinates: [number, number] };
-            properties: Record<string, string>;
-          }>;
-        };
-        const sug: Suggestion[] = (data.features ?? [])
-          .map((f) => {
-            const p = f.properties;
-            return {
-              name: p.name || p.street || q,
-              city: p.city || p.town || p.district || p.state || "",
-              lat: f.geometry.coordinates[1],
-              lng: f.geometry.coordinates[0],
-            };
-          })
-          .filter(
-            (s) =>
-              s.lat >= BAY.s &&
-              s.lat <= BAY.n &&
-              s.lng >= BAY.w &&
-              s.lng <= BAY.e
-          )
-          .slice(0, 6);
-        setSuggestions(sug);
+        if (MAPBOX) {
+          if (!sessionRef.current) sessionRef.current = crypto.randomUUID();
+          const res = await fetch(
+            "https://api.mapbox.com/search/searchbox/v1/suggest" +
+              `?q=${encodeURIComponent(q)}` +
+              `&access_token=${MAPBOX}&session_token=${sessionRef.current}` +
+              `&proximity=-122.42,37.77&bbox=${BAY.w},${BAY.s},${BAY.e},${BAY.n}` +
+              "&country=us&types=poi&limit=6"
+          );
+          const data = (await res.json()) as {
+            suggestions?: Array<{
+              name: string;
+              place_formatted?: string;
+              mapbox_id: string;
+            }>;
+          };
+          setSuggestions(
+            (data.suggestions ?? []).map((s) => ({
+              name: s.name,
+              city: (s.place_formatted ?? "").split(",")[0] ?? "",
+              mapboxId: s.mapbox_id,
+            }))
+          );
+        } else {
+          const res = await fetch(
+            `https://photon.komoot.io/api/?q=${encodeURIComponent(q)}` +
+              "&lat=37.77&lon=-122.42&limit=8&lang=en"
+          );
+          const data = (await res.json()) as {
+            features: Array<{
+              geometry: { coordinates: [number, number] };
+              properties: Record<string, string>;
+            }>;
+          };
+          setSuggestions(
+            (data.features ?? [])
+              .map((f) => ({
+                name: f.properties.name || f.properties.street || q,
+                city:
+                  f.properties.city ||
+                  f.properties.town ||
+                  f.properties.state ||
+                  "",
+                lat: f.geometry.coordinates[1],
+                lng: f.geometry.coordinates[0],
+              }))
+              .filter(
+                (s) =>
+                  s.lat >= BAY.s &&
+                  s.lat <= BAY.n &&
+                  s.lng >= BAY.w &&
+                  s.lng <= BAY.e
+              )
+              .slice(0, 6)
+          );
+        }
       } catch {
         setSuggestions([]);
       }
@@ -263,16 +301,44 @@ export default function BayMap({ active = true }: { active?: boolean }) {
     return () => clearTimeout(id);
   }, [query, searching]);
 
-  const pick = (s: Suggestion) => {
+  const pick = async (s: Suggestion) => {
+    let lat = s.lat;
+    let lng = s.lng;
+    let city = s.city;
+    // Mapbox suggestions carry no coordinates; retrieve them on selection
+    if (s.mapboxId && MAPBOX) {
+      try {
+        const res = await fetch(
+          `https://api.mapbox.com/search/searchbox/v1/retrieve/${s.mapboxId}` +
+            `?access_token=${MAPBOX}&session_token=${sessionRef.current}`
+        );
+        const data = (await res.json()) as {
+          features?: Array<{
+            geometry: { coordinates: [number, number] };
+            properties: { context?: { place?: { name?: string } } };
+          }>;
+        };
+        const f = data.features?.[0];
+        if (f) {
+          lng = f.geometry.coordinates[0];
+          lat = f.geometry.coordinates[1];
+          city = f.properties.context?.place?.name || city;
+        }
+      } catch {
+        /* fall through with whatever we have */
+      }
+      sessionRef.current = ""; // new session after a completed search
+    }
+    if (lat == null || lng == null) return;
     const saved = addRequest({
       name: s.name,
-      neighborhood: s.city,
+      neighborhood: city,
       note: note.trim(),
-      lat: +s.lat.toFixed(5),
-      lng: +s.lng.toFixed(5),
+      lat: +lat.toFixed(5),
+      lng: +lng.toFixed(5),
     });
     setRequests((prev) => [...prev, saved]);
-    mapRef.current?.setView([s.lat, s.lng], 15);
+    mapRef.current?.setView([lat, lng], 15);
     cancel();
   };
 
