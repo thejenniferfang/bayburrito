@@ -257,18 +257,25 @@ function Comments({ burritoId }: { burritoId: string }) {
             ))}
         </ul>
       )}
-      <div className="flex items-center gap-2 rounded-lg bg-black/5 px-2">
+      <div
+        className="flex items-center gap-2 rounded-full px-4 py-1"
+        style={{
+          background: "#6e8c3e",
+          boxShadow:
+            "inset 0 1px 0 rgba(255,255,255,0.3), inset 0 -2px 4px rgba(0,0,0,0.22)",
+        }}
+      >
         <input
           value={draft}
           onChange={(e) => setDraft(e.target.value)}
           onKeyDown={(e) => e.key === "Enter" && post()}
           placeholder="leave a note..."
           aria-label="Leave a comment"
-          className="paper-input w-full bg-transparent py-1 font-hand text-xl text-(--paper-ink) placeholder:text-(--paper-ink)/35 focus:outline-none"
+          className="paper-input w-full bg-transparent py-1 font-hand text-lg text-white placeholder:text-white/60 focus:outline-none"
         />
         <button
           onClick={post}
-          className="pressable pb-1 font-hand text-lg text-(--paper-ink)/60 transition-colors duration-150 hover:text-(--salsa)"
+          className="pressable font-hand text-lg text-white/90 transition-colors duration-150 hover:text-white"
         >
           post
         </button>

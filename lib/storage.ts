@@ -26,6 +26,7 @@ export interface SpotRequest {
   lat: number;
   lng: number;
   at: number;
+  mine: boolean; // created by this browser (only these can be removed)
 }
 
 const COMMENTS_KEY = "bbc-comments";
@@ -176,27 +177,76 @@ export async function addComment(
     : null;
 }
 
-/* ------------------------- spot requests (local) ------------------------- */
+/* --------------------- spot requests (shared, Supabase) --------------------- */
 
-export function getRequests(): SpotRequest[] {
-  return read<SpotRequest[]>(REQUESTS_KEY, []);
+type NewRequest = Omit<SpotRequest, "id" | "at" | "mine">;
+
+export async function getRequests(): Promise<SpotRequest[]> {
+  if (!supabase) {
+    return read<SpotRequest[]>(REQUESTS_KEY, []).map((r) => ({
+      ...r,
+      mine: true,
+    }));
+  }
+  const { data } = await supabase
+    .from("requests")
+    .select("id, name, neighborhood, note, lat, lng, client_id, created_at")
+    .order("created_at", { ascending: true });
+  const me = clientId();
+  return (data ?? []).map((r) => ({
+    id: r.id as string,
+    name: r.name as string,
+    neighborhood: (r.neighborhood as string) ?? "",
+    note: (r.note as string) ?? "",
+    lat: Number(r.lat),
+    lng: Number(r.lng),
+    at: new Date(r.created_at as string).getTime(),
+    mine: r.client_id === me,
+  }));
 }
 
-export function removeRequest(id: string) {
-  write(
-    REQUESTS_KEY,
-    read<SpotRequest[]>(REQUESTS_KEY, []).filter((r) => r.id !== id)
-  );
+export async function addRequest(r: NewRequest): Promise<SpotRequest | null> {
+  if (!supabase) {
+    const all = read<SpotRequest[]>(REQUESTS_KEY, []);
+    const req: SpotRequest = {
+      ...r,
+      id: `r-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+      at: Date.now(),
+      mine: true,
+    };
+    all.push(req);
+    write(REQUESTS_KEY, all);
+    return req;
+  }
+  const { data } = await supabase
+    .from("requests")
+    .insert({
+      name: r.name,
+      neighborhood: r.neighborhood,
+      note: r.note,
+      lat: r.lat,
+      lng: r.lng,
+      client_id: clientId(),
+    })
+    .select("id, created_at")
+    .single();
+  return data
+    ? {
+        ...r,
+        id: data.id as string,
+        at: new Date(data.created_at as string).getTime(),
+        mine: true,
+      }
+    : null;
 }
 
-export function addRequest(r: Omit<SpotRequest, "id" | "at">): SpotRequest {
-  const all = read<SpotRequest[]>(REQUESTS_KEY, []);
-  const request: SpotRequest = {
-    ...r,
-    id: `r-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
-    at: Date.now(),
-  };
-  all.push(request);
-  write(REQUESTS_KEY, all);
-  return request;
+export async function removeRequest(id: string): Promise<void> {
+  if (!supabase) {
+    write(
+      REQUESTS_KEY,
+      read<SpotRequest[]>(REQUESTS_KEY, []).filter((r) => r.id !== id)
+    );
+    return;
+  }
+  await supabase.from("requests").delete().eq("id", id);
 }

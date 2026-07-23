@@ -148,8 +148,8 @@ export default function BayMap({ active = true }: { active?: boolean }) {
       ro.observe(holder.current!);
       roRef.current = ro;
 
-      // user requests from a prior session
-      setRequests(getRequests());
+      // shared requests from everyone
+      getRequests().then(setRequests);
     })();
     return () => {
       cancelled = true;
@@ -208,7 +208,7 @@ export default function BayMap({ active = true }: { active?: boolean }) {
             <div style="font-family:var(--font-bitcount);font-size:13px;color:#201a13">${esc(r.name)}</div>
             <div style="font-family:var(--font-hand);font-size:15px;opacity:.7">${esc(r.neighborhood)}</div>
             ${r.note ? `<div style="font-family:var(--font-hand);font-size:15px;margin-top:2px;max-width:200px">${esc(r.note)}</div>` : ""}
-            <button data-remove-request="${r.id}" style="font-family:var(--font-hand);font-size:14px;color:#d13a24;background:none;border:none;padding:4px 0 0;cursor:pointer">remove</button>
+            ${r.mine ? `<button data-remove-request="${r.id}" style="font-family:var(--font-hand);font-size:14px;color:#d13a24;background:none;border:none;padding:4px 0 0;cursor:pointer">remove</button>` : ""}
           </div>`
         )
     );
@@ -222,9 +222,8 @@ export default function BayMap({ active = true }: { active?: boolean }) {
       const t = (e.target as HTMLElement).closest("[data-remove-request]");
       if (!t) return;
       const id = t.getAttribute("data-remove-request")!;
-      removeRequest(id);
       mapRef.current?.closePopup();
-      setRequests(getRequests());
+      removeRequest(id).then(() => getRequests().then(setRequests));
     };
     el.addEventListener("click", onClick);
     return () => el.removeEventListener("click", onClick);
@@ -334,16 +333,16 @@ export default function BayMap({ active = true }: { active?: boolean }) {
       sessionRef.current = ""; // new session after a completed search
     }
     if (lat == null || lng == null) return;
-    const saved = addRequest({
+    mapRef.current?.setView([lat, lng], 15);
+    cancel();
+    const saved = await addRequest({
       name: s.name,
       neighborhood: city,
       note: note.trim(),
       lat: +lat.toFixed(5),
       lng: +lng.toFixed(5),
     });
-    setRequests((prev) => [...prev, saved]);
-    mapRef.current?.setView([lat, lng], 15);
-    cancel();
+    if (saved) setRequests((prev) => [...prev, saved]);
   };
 
   const cancel = () => {

@@ -34,13 +34,18 @@ export default function SegmentedControl({
             onClick={() => onChange(opt.key)}
             style={{ fontFamily: "var(--font-bitcount)" }}
             className={`pressable relative rounded-full px-4 py-1 text-sm leading-none transition-colors duration-200 md:px-5 ${
-              active ? "text-(--bg)" : "text-(--ink-dim) hover:text-(--ink)"
+              active ? "text-white" : "text-(--ink-dim) hover:text-(--ink)"
             }`}
           >
             {active && (
               <motion.span
                 layoutId="segment-pill"
-                className="absolute inset-0 rounded-full bg-(--salsa)"
+                className="absolute inset-0 rounded-full"
+                style={{
+                  background: "#6e8c3e",
+                  boxShadow:
+                    "inset 0 1px 0 rgba(255,255,255,0.3), inset 0 -2px 4px rgba(0,0,0,0.22)",
+                }}
                 transition={{ type: "spring", duration: 0.4, bounce: 0.18 }}
               />
             )}
