@@ -14,7 +14,7 @@ function pinHtml(color: string, requested = false) {
   const ring = requested ? `stroke='#fff' stroke-width='2' stroke-dasharray='3 2'` : "";
   return `<svg width="26" height="34" viewBox="0 0 26 34" xmlns="http://www.w3.org/2000/svg">
     <path d="M13 33C13 33 24 20.5 24 12A11 11 0 1 0 2 12C2 20.5 13 33 13 33Z"
-      fill="${color}" stroke="rgba(0,0,0,0.25)" stroke-width="1"/>
+      fill="${color}"/>
     <circle cx="13" cy="12" r="4.5" fill="#fff" ${ring}/>
   </svg>`;
 }
@@ -304,7 +304,12 @@ export default function BayMap({ active = true }: { active?: boolean }) {
         className="absolute bottom-6 left-4 z-[900] rounded-lg border border-(--line) bg-(--surface)/95 px-3.5 py-2.5"
         style={{ fontFamily: "var(--font-hand)" }}
       >
-        <p className="mb-1 text-lg leading-none text-(--ink)/70">tiers</p>
+        <p
+          className="mb-1 text-xs leading-none text-(--ink)/70"
+          style={{ fontFamily: "var(--font-bitcount)" }}
+        >
+          tiers
+        </p>
         <div className="flex items-center gap-2.5">
           {TIERS.map((t) => (
             <span key={t} className="flex items-center gap-1">

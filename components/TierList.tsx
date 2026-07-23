@@ -101,8 +101,11 @@ function DetailModal({
         <div className="flex items-start justify-between gap-4">
           <div className="min-w-0">
             <span
-              className="font-hand text-5xl leading-none"
-              style={{ color: TIER_COLORS[burrito.tier] }}
+              className="text-5xl leading-none"
+              style={{
+                color: TIER_COLORS[burrito.tier],
+                fontFamily: "var(--font-bitcount)",
+              }}
             >
               {burrito.tier}
             </span>
@@ -137,7 +140,8 @@ function DetailModal({
         )}
         <button
           onClick={onClose}
-          className="pressable mt-5 w-full rounded-md border border-(--line) py-2 font-hand text-xl text-(--ink-dim) transition-colors duration-150 hover:text-(--ink)"
+          style={{ background: "var(--tier-s)", fontFamily: "var(--font-bitcount)" }}
+          className="pressable mt-5 w-full rounded-md py-2.5 text-sm text-white transition-opacity duration-150 hover:opacity-90"
         >
           close
         </button>
