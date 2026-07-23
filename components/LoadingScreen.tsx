@@ -96,8 +96,8 @@ export default function LoadingScreen({ onDone }: { onDone: () => void }) {
 
       <button
         onClick={skip}
-        className="pressable absolute bottom-8 right-8 text-xs uppercase tracking-[0.2em] text-(--ink-dim) transition-colors duration-150 hover:text-(--ink)"
-        style={{ fontFamily: "var(--font-mono)" }}
+        className="pressable absolute bottom-8 right-8 text-sm text-(--ink-dim) transition-colors duration-150 hover:text-(--ink)"
+        style={{ fontFamily: "var(--font-bitcount)" }}
       >
         skip
       </button>
