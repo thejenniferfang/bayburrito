@@ -294,12 +294,25 @@ function SusanItem({
       className="absolute left-1/2"
       style={{ top: cy, width: itemW, transform, filter, opacity, zIndex }}
     >
-      <BurritoImage
-        src={burrito.imgUrl}
-        alt={burrito.taqueria}
-        variant={index}
-        className="relative w-full"
-      />
+      {/* one-time entrance: each burrito pops onto the table, staggered
+          around the wheel so they cascade in */}
+      <motion.div
+        initial={{ opacity: 0, scale: 0.3 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{
+          type: "spring",
+          stiffness: 220,
+          damping: 18,
+          delay: Math.min(index * 0.05, 1.3),
+        }}
+      >
+        <BurritoImage
+          src={burrito.imgUrl}
+          alt={burrito.taqueria}
+          variant={index}
+          className="relative w-full"
+        />
+      </motion.div>
     </motion.div>
   );
 }

@@ -46,10 +46,10 @@ export default function TierList() {
                       style={{ background: TIER_COLORS[tier] }}
                       className="pressable flex flex-col items-start rounded-md px-2.5 py-1.5 text-left leading-tight transition-opacity duration-200 hover:opacity-90"
                     >
-                      <span className="w-full truncate text-[13px] font-medium text-white">
+                      <span className="w-full truncate font-hand text-lg leading-tight text-white">
                         {b.taqueria}
                       </span>
-                      <span className="w-full truncate text-[11px] text-white/75">
+                      <span className="w-full truncate font-hand text-sm leading-tight text-white/80">
                         {b.neighborhood}
                       </span>
                     </button>
