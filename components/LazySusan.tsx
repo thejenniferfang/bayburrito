@@ -142,7 +142,16 @@ export default function LazySusan({
     if (!d.dragging) return;
     d.dragging = false;
     if (d.travel < TAP_SLOP_PX) {
-      if (d.tapIndex !== null) goTo(d.tapIndex);
+      if (d.tapIndex !== null) {
+        // tapping the front burrito opens its review; tapping another
+        // brings it to the front
+        if (d.tapIndex === activeIndexRef.current) {
+          const url = burritos[d.tapIndex]?.videoUrl;
+          if (url) window.open(url, "_blank", "noopener");
+        } else {
+          goTo(d.tapIndex);
+        }
+      }
       return;
     }
     // project momentum forward, then settle on the nearest burrito

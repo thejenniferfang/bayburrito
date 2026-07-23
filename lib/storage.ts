@@ -1,14 +1,21 @@
 /**
- * Storage interface for user ratings + comments.
- * v1 backs onto localStorage; swap this file for a real backend later
- * without touching any component.
+ * Ratings + comments are community data backed by Supabase (see lib/supabase).
+ * If Supabase is not configured, everything falls back to localStorage so the
+ * app still works on-device. Spot requests stay local-only.
  */
+import { supabase } from "./supabase";
 
 export interface UserComment {
   id: string;
   burritoId: string;
   text: string;
   at: number; // epoch ms
+}
+
+export interface CommunityRating {
+  avg: number | null; // community average, 0-10
+  count: number; // number of ratings
+  mine: number | null; // this browser's rating
 }
 
 export interface SpotRequest {
@@ -21,9 +28,10 @@ export interface SpotRequest {
   at: number;
 }
 
-const RATINGS_KEY = "bbc-ratings";
 const COMMENTS_KEY = "bbc-comments";
+const RATINGS_KEY = "bbc-ratings";
 const REQUESTS_KEY = "bbc-requests";
+const CLIENT_KEY = "bbc-client";
 
 function read<T>(key: string, fallback: T): T {
   if (typeof window === "undefined") return fallback;
@@ -40,39 +48,121 @@ function write(key: string, value: unknown) {
   try {
     window.localStorage.setItem(key, JSON.stringify(value));
   } catch {
-    // storage full or blocked; ratings just won't persist
+    // storage full or blocked
   }
 }
 
-export function getRatings(): Record<string, number> {
-  return read<Record<string, number>>(RATINGS_KEY, {});
+/** Stable anonymous id so a browser gets one rating per place. */
+function clientId(): string {
+  if (typeof window === "undefined") return "server";
+  let id = window.localStorage.getItem(CLIENT_KEY);
+  if (!id) {
+    id =
+      typeof crypto !== "undefined" && crypto.randomUUID
+        ? crypto.randomUUID()
+        : `c-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+    window.localStorage.setItem(CLIENT_KEY, id);
+  }
+  return id;
 }
 
-export function addRating(burritoId: string, rating: number) {
-  const ratings = getRatings();
-  ratings[burritoId] = Math.max(0, Math.min(10, rating));
-  write(RATINGS_KEY, ratings);
+/* ----------------------------- ratings ----------------------------- */
+
+export async function getCommunityRating(
+  burritoId: string
+): Promise<CommunityRating> {
+  if (!supabase) {
+    const mine = read<Record<string, number>>(RATINGS_KEY, {})[burritoId] ?? null;
+    return { avg: mine, count: mine == null ? 0 : 1, mine };
+  }
+  const { data } = await supabase
+    .from("ratings")
+    .select("score, client_id")
+    .eq("burrito_id", burritoId);
+  const rows = data ?? [];
+  const count = rows.length;
+  const avg = count
+    ? rows.reduce((s, r) => s + Number(r.score), 0) / count
+    : null;
+  const mineRow = rows.find((r) => r.client_id === clientId());
+  return { avg, count, mine: mineRow ? Number(mineRow.score) : null };
 }
 
-export function getComments(burritoId: string): UserComment[] {
-  const all = read<UserComment[]>(COMMENTS_KEY, []);
-  return all.filter((c) => c.burritoId === burritoId);
+export async function setMyRating(
+  burritoId: string,
+  score: number
+): Promise<void> {
+  const s = Math.max(0, Math.min(10, score));
+  if (!supabase) {
+    const ratings = read<Record<string, number>>(RATINGS_KEY, {});
+    ratings[burritoId] = s;
+    write(RATINGS_KEY, ratings);
+    return;
+  }
+  await supabase
+    .from("ratings")
+    .upsert(
+      { burrito_id: burritoId, client_id: clientId(), score: s },
+      { onConflict: "burrito_id,client_id" }
+    );
 }
 
-export function addComment(burritoId: string, text: string): UserComment {
-  const all = read<UserComment[]>(COMMENTS_KEY, []);
-  const comment: UserComment = {
-    id: `c-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+/* ----------------------------- comments ----------------------------- */
+
+export async function getComments(burritoId: string): Promise<UserComment[]> {
+  if (!supabase) {
+    return read<UserComment[]>(COMMENTS_KEY, []).filter(
+      (c) => c.burritoId === burritoId
+    );
+  }
+  const { data } = await supabase
+    .from("comments")
+    .select("id, body, created_at")
+    .eq("burrito_id", burritoId)
+    .order("created_at", { ascending: true });
+  return (data ?? []).map((r) => ({
+    id: r.id as string,
     burritoId,
-    text: text.trim(),
-    at: Date.now(),
-  };
-  all.push(comment);
-  write(COMMENTS_KEY, all);
-  return comment;
+    text: r.body as string,
+    at: new Date(r.created_at as string).getTime(),
+  }));
 }
 
-/** Spots users want fluffie to review next. Persisted locally for v1. */
+export async function addComment(
+  burritoId: string,
+  text: string
+): Promise<UserComment | null> {
+  const body = text.trim();
+  if (!body) return null;
+  if (!supabase) {
+    const all = read<UserComment[]>(COMMENTS_KEY, []);
+    const c: UserComment = {
+      id: `c-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+      burritoId,
+      text: body,
+      at: Date.now(),
+    };
+    all.push(c);
+    write(COMMENTS_KEY, all);
+    return c;
+  }
+  const { data } = await supabase
+    .from("comments")
+    .insert({ burrito_id: burritoId, body })
+    .select("id, created_at")
+    .single();
+  return data
+    ? {
+        id: data.id as string,
+        burritoId,
+        text: body,
+        at: new Date(data.created_at as string).getTime(),
+      }
+    : null;
+}
+
+/* ------------------------- spot requests (local) ------------------------- */
+
 export function getRequests(): SpotRequest[] {
   return read<SpotRequest[]>(REQUESTS_KEY, []);
 }
@@ -84,9 +174,7 @@ export function removeRequest(id: string) {
   );
 }
 
-export function addRequest(
-  r: Omit<SpotRequest, "id" | "at">
-): SpotRequest {
+export function addRequest(r: Omit<SpotRequest, "id" | "at">): SpotRequest {
   const all = read<SpotRequest[]>(REQUESTS_KEY, []);
   const request: SpotRequest = {
     ...r,

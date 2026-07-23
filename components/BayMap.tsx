@@ -29,13 +29,17 @@ const MAPBOX = process.env.NEXT_PUBLIC_MAPBOX_TOKEN;
 // Bay Area bounding box (west, east, south, north) for biasing + filtering
 const BAY = { w: -122.75, e: -121.55, s: 36.85, n: 38.1 };
 
-// a colored pin as an inline SVG divIcon (no marker image assets to 404)
+// a colored pin as an inline SVG divIcon (no marker image assets to 404).
+// requested pins get a hollow center ring so they read differently from the
+// solid reviewed pins.
 function pinHtml(color: string, requested = false) {
-  const ring = requested ? `stroke='#fff' stroke-width='2' stroke-dasharray='3 2'` : "";
+  const center = requested
+    ? `<circle cx="13" cy="12" r="4" fill="none" stroke="#fff" stroke-width="2.5"/>`
+    : `<circle cx="13" cy="12" r="4.5" fill="#fff"/>`;
   return `<svg width="26" height="34" viewBox="0 0 26 34" xmlns="http://www.w3.org/2000/svg">
     <path d="M13 33C13 33 24 20.5 24 12A11 11 0 1 0 2 12C2 20.5 13 33 13 33Z"
       fill="${color}"/>
-    <circle cx="13" cy="12" r="4.5" fill="#fff" ${ring}/>
+    ${center}
   </svg>`;
 }
 

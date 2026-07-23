@@ -5,9 +5,10 @@ import { AnimatePresence, motion } from "motion/react";
 import { TIER_COLORS, type Burrito } from "@/data/burritos";
 import {
   addComment,
-  addRating,
   getComments,
-  getRatings,
+  getCommunityRating,
+  setMyRating,
+  type CommunityRating,
   type UserComment,
 } from "@/lib/storage";
 
@@ -109,15 +110,31 @@ function BeliStamp({ score }: { score: number }) {
   );
 }
 
-/** Salsa-red fill bar, click or drag to rate 0-10. */
+/** Salsa-red fill bar for the user's own rating; shows community average. */
 function RatingBar({ burritoId }: { burritoId: string }) {
-  const [value, setValue] = useState<number | null>(null);
+  const [c, setC] = useState<CommunityRating>({
+    avg: null,
+    count: 0,
+    mine: null,
+  });
+  const value = c.mine;
   const trackRef = useRef<HTMLDivElement>(null);
   const dragging = useRef(false);
 
   useEffect(() => {
-    setValue(getRatings()[burritoId] ?? null);
+    let ok = true;
+    getCommunityRating(burritoId).then((r) => ok && setC(r));
+    return () => {
+      ok = false;
+    };
   }, [burritoId]);
+
+  const commit = async (v: number) => {
+    setC((prev) => ({ ...prev, mine: v })); // optimistic
+    await setMyRating(burritoId, v);
+    const fresh = await getCommunityRating(burritoId);
+    setC(fresh);
+  };
 
   const setFromEvent = (clientX: number) => {
     const el = trackRef.current;
@@ -125,8 +142,8 @@ function RatingBar({ burritoId }: { burritoId: string }) {
     const rect = el.getBoundingClientRect();
     const raw = ((clientX - rect.left) / rect.width) * 10;
     const v = Math.round(Math.max(0, Math.min(10, raw)) * 2) / 2;
-    setValue(v);
-    addRating(burritoId, v);
+    setC((prev) => ({ ...prev, mine: v }));
+    void commit(v);
   };
 
   return (
@@ -172,8 +189,7 @@ function RatingBar({ burritoId }: { burritoId: string }) {
             0,
             Math.min(10, (value ?? 5) + (e.key === "ArrowRight" ? 0.5 : -0.5))
           );
-          setValue(next);
-          addRating(burritoId, next);
+          void commit(next);
         }}
       >
         <motion.div
@@ -183,6 +199,13 @@ function RatingBar({ burritoId }: { burritoId: string }) {
           transition={{ type: "spring", stiffness: 300, damping: 20 }}
         />
       </div>
+      <p className="mt-1 font-hand text-base leading-none text-(--paper-ink)/55">
+        {c.avg == null
+          ? "no ratings yet, be the first"
+          : `community ${c.avg.toFixed(1)}/10 · ${c.count} rating${
+              c.count === 1 ? "" : "s"
+            }`}
+      </p>
     </div>
   );
 }
@@ -192,14 +215,19 @@ function Comments({ burritoId }: { burritoId: string }) {
   const [draft, setDraft] = useState("");
 
   useEffect(() => {
-    setComments(getComments(burritoId));
+    let ok = true;
+    getComments(burritoId).then((cs) => ok && setComments(cs));
+    return () => {
+      ok = false;
+    };
   }, [burritoId]);
 
-  const post = () => {
+  const post = async () => {
     if (!draft.trim()) return;
-    const c = addComment(burritoId, draft);
-    setComments((prev) => [...prev, c]);
+    const text = draft;
     setDraft("");
+    const c = await addComment(burritoId, text);
+    if (c) setComments((prev) => [...prev, c]);
   };
 
   return (
