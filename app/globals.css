@@ -129,6 +129,13 @@ textarea {
   outline-offset: 2px;
 }
 
+/* fields that show their own focus border: suppress the global outline so
+   they don't read as double-bordered */
+.paper-input:focus,
+.paper-input:focus-visible {
+  outline: none !important;
+}
+
 /* Leaflet: warm it up and drop the default chrome */
 .leaflet-container {
   background: var(--bg-warm) !important;

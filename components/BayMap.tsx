@@ -406,7 +406,7 @@ export default function BayMap({ active = true }: { active?: boolean }) {
               if (e.key === "Enter" && suggestions[0]) pick(suggestions[0]);
             }}
             placeholder="start typing a taqueria..."
-            className="w-full rounded-xl border-2 border-transparent px-3 py-2 text-lg text-(--ink) placeholder:text-(--ink-dim)/55 focus:border-(--salsa) focus:outline-none"
+            className="paper-input w-full rounded-xl border-2 border-transparent px-3 py-2 text-lg text-(--ink) placeholder:text-(--ink-dim)/55 focus:border-(--salsa) focus:outline-none focus-visible:outline-none"
             style={{
               background: "#f1eacf",
               boxShadow: "inset 0 2px 4px rgba(120,95,50,0.22)",
@@ -450,7 +450,7 @@ export default function BayMap({ active = true }: { active?: boolean }) {
             value={note}
             onChange={(e) => setNote(e.target.value)}
             placeholder="why should he go? (optional)"
-            className="mt-2 w-full rounded-xl border-2 border-transparent px-3 py-2 text-lg text-(--ink) placeholder:text-(--ink-dim)/55 focus:border-(--salsa) focus:outline-none"
+            className="paper-input mt-2 w-full rounded-xl border-2 border-transparent px-3 py-2 text-lg text-(--ink) placeholder:text-(--ink-dim)/55 focus:border-(--salsa) focus:outline-none focus-visible:outline-none"
             style={{
               background: "#f1eacf",
               boxShadow: "inset 0 2px 4px rgba(120,95,50,0.22)",
