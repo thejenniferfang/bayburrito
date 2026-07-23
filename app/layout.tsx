@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist_Mono, Space_Mono } from "next/font/google";
 import localFont from "next/font/local";
 import "./globals.css";
+import { AgentationProvider } from "@/components/agentation-provider";
 
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
@@ -36,6 +37,7 @@ export default function RootLayout({
         className={`${geistMono.variable} ${spaceMono.variable} ${handOfJen.variable} grain antialiased`}
       >
         {children}
+        <AgentationProvider />
       </body>
     </html>
   );
