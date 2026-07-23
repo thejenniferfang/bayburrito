@@ -4,7 +4,12 @@ import { useEffect, useRef, useState } from "react";
 import type { Map as LMap, Marker } from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { BURRITOS, TIERS, TIER_COLORS } from "@/data/burritos";
-import { addRequest, getRequests, type SpotRequest } from "@/lib/storage";
+import {
+  addRequest,
+  getRequests,
+  removeRequest,
+  type SpotRequest,
+} from "@/lib/storage";
 
 const esc = (s: string) =>
   s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/"/g, "&quot;");
@@ -83,11 +88,14 @@ export default function BayMap({ active = true }: { active?: boolean }) {
         })
           .addTo(map)
           .bindPopup(
-            `<div style="font-family:var(--font-mono)">
-              <div style="font-weight:700;color:${color}">${esc(b.tier)} &middot; ${esc(b.taqueria)}</div>
-              <div style="font-size:11px;opacity:.7">${esc(b.neighborhood)}</div>
-              <div style="font-family:var(--font-hand);font-size:16px;margin-top:4px;max-width:200px">&ldquo;${esc(b.fluffieNotes)}&rdquo;</div>
-              ${b.videoUrl ? `<a href="${b.videoUrl}" target="_blank" rel="noreferrer" style="font-size:11px;color:#d13a24">watch the review &rarr;</a>` : ""}
+            `<div>
+              <div style="font-family:var(--font-bitcount);font-size:15px;color:${color}">${esc(b.tier)}</div>
+              ${
+                b.videoUrl
+                  ? `<a href="${b.videoUrl}" target="_blank" rel="noreferrer" title="watch the review" style="font-family:var(--font-bitcount);font-size:13px;color:#201a13;text-decoration:none">${esc(b.taqueria)}</a>`
+                  : `<div style="font-family:var(--font-bitcount);font-size:13px;color:#201a13">${esc(b.taqueria)}</div>`
+              }
+              <div style="font-family:var(--font-hand);font-size:15px;opacity:.7">${esc(b.neighborhood)}</div>
             </div>`
           );
       }
@@ -175,15 +183,32 @@ export default function BayMap({ active = true }: { active?: boolean }) {
       })
         .addTo(map)
         .bindPopup(
-          `<div style="font-family:var(--font-mono)">
-            <div style="font-weight:700;color:#e0356b">REQUESTED</div>
-            <div style="font-weight:700">${esc(r.name)}</div>
-            <div style="font-size:11px;opacity:.7">${esc(r.neighborhood)}</div>
-            ${r.note ? `<div style="font-family:var(--font-hand);font-size:16px;margin-top:4px;max-width:200px">${esc(r.note)}</div>` : ""}
+          `<div>
+            <div style="font-family:var(--font-bitcount);font-size:13px;color:#e0356b">requested</div>
+            <div style="font-family:var(--font-bitcount);font-size:13px;color:#201a13">${esc(r.name)}</div>
+            <div style="font-family:var(--font-hand);font-size:15px;opacity:.7">${esc(r.neighborhood)}</div>
+            ${r.note ? `<div style="font-family:var(--font-hand);font-size:15px;margin-top:2px;max-width:200px">${esc(r.note)}</div>` : ""}
+            <button data-remove-request="${r.id}" style="font-family:var(--font-hand);font-size:14px;color:#d13a24;background:none;border:none;padding:4px 0 0;cursor:pointer">remove</button>
           </div>`
         )
     );
   }, [requests]);
+
+  // delegated: "remove" inside a requested-pin popup deletes that request
+  useEffect(() => {
+    const el = holder.current;
+    if (!el) return;
+    const onClick = (e: Event) => {
+      const t = (e.target as HTMLElement).closest("[data-remove-request]");
+      if (!t) return;
+      const id = t.getAttribute("data-remove-request")!;
+      removeRequest(id);
+      mapRef.current?.closePopup();
+      setRequests(getRequests());
+    };
+    el.addEventListener("click", onClick);
+    return () => el.removeEventListener("click", onClick);
+  }, []);
 
   // Beli-style: type the place name, we geocode it and drop the pin.
   const search = async () => {
@@ -192,22 +217,28 @@ export default function BayMap({ active = true }: { active?: boolean }) {
     setBusy(true);
     setError(null);
     try {
-      // Nominatim matches better on the raw name; only fall back to a
-      // ", California" hint. viewbox biases results toward the Bay Area.
+      // Restrict results to the Bay Area: bounded=1 confines Nominatim to
+      // the viewbox, and we double-check the returned point is inside it.
+      const BAY = { w: -122.75, e: -121.55, s: 36.85, n: 38.1 };
       const base =
-        "https://nominatim.openstreetmap.org/search?format=json&limit=1&addressdetails=1" +
-        "&viewbox=-122.75,38.1,-121.55,36.85&bounded=0";
+        "https://nominatim.openstreetmap.org/search?format=json&limit=5&addressdetails=1" +
+        `&viewbox=${BAY.w},${BAY.n},${BAY.e},${BAY.s}&bounded=1`;
       type Hit = { lat: string; lon: string; address?: Record<string, string> };
+      const inBay = (h: Hit) => {
+        const la = +h.lat,
+          lo = +h.lon;
+        return la >= BAY.s && la <= BAY.n && lo >= BAY.w && lo <= BAY.e;
+      };
       let hit: Hit | undefined;
       for (const variant of [q, `${q}, California`]) {
         const res = await fetch(`${base}&q=${encodeURIComponent(variant)}`, {
           headers: { Accept: "application/json" },
         });
-        hit = ((await res.json()) as Hit[])[0];
+        hit = ((await res.json()) as Hit[]).find(inBay);
         if (hit) break;
       }
       if (!hit) {
-        setError("couldn't find that. try adding the city.");
+        setError("couldn't find that in the Bay Area. try adding the city.");
         setBusy(false);
         return;
       }
@@ -305,7 +336,7 @@ export default function BayMap({ active = true }: { active?: boolean }) {
         style={{ fontFamily: "var(--font-hand)" }}
       >
         <p
-          className="mb-1 text-xs leading-none text-(--ink)/70"
+          className="mb-1.5 text-base leading-none text-(--ink)/70"
           style={{ fontFamily: "var(--font-bitcount)" }}
         >
           tiers

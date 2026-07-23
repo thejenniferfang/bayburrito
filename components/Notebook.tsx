@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
-import type { Burrito } from "@/data/burritos";
+import { TIER_COLORS, type Burrito } from "@/data/burritos";
 import {
   addComment,
   addRating,
@@ -47,6 +47,9 @@ export default function Notebook({ burrito }: { burrito: Burrito }) {
                   className="text-xl leading-tight text-(--paper-ink) md:text-3xl"
                   style={{ fontFamily: "var(--font-bitcount)" }}
                 >
+                  <span style={{ color: TIER_COLORS[burrito.tier] }}>
+                    {burrito.tier}
+                  </span>{" "}
                   {burrito.videoUrl ? (
                     <a
                       href={burrito.videoUrl}

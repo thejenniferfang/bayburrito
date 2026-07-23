@@ -77,6 +77,13 @@ export function getRequests(): SpotRequest[] {
   return read<SpotRequest[]>(REQUESTS_KEY, []);
 }
 
+export function removeRequest(id: string) {
+  write(
+    REQUESTS_KEY,
+    read<SpotRequest[]>(REQUESTS_KEY, []).filter((r) => r.id !== id)
+  );
+}
+
 export function addRequest(
   r: Omit<SpotRequest, "id" | "at">
 ): SpotRequest {
