@@ -46,18 +46,28 @@ export default function Home() {
         transition={{ duration: 0.5, ease: [0.23, 1, 0.32, 1] }}
       >
         <header className="grid grid-cols-[1fr_auto_1fr] items-center gap-3 bg-(--bg) px-4 py-3 md:px-8">
-          <h1
-            className="truncate text-xl leading-none text-(--ink) md:text-2xl"
-            style={{ fontFamily: "var(--font-bitcount)" }}
-          >
-            <span className="md:hidden">BBC</span>
-            <span className="hidden md:inline">Bay Burrito Challenge</span>
-          </h1>
+          <div className="flex min-w-0 items-baseline gap-2.5">
+            <h1
+              className="truncate text-xl leading-none text-(--ink) md:text-2xl"
+              style={{ fontFamily: "var(--font-bitcount)" }}
+            >
+              <span className="md:hidden">BBC</span>
+              <span className="hidden md:inline">Bay Burrito Challenge</span>
+            </h1>
+            {/* scope disclaimer (desktop inline); mobile gets its own line below */}
+            <span className="hidden truncate font-hand text-base text-(--ink-dim) md:inline">
+              &amp; some other northern california
+            </span>
+          </div>
           <div className="justify-self-center">
             <SegmentedControl value={view} onChange={setView} />
           </div>
           <div />
         </header>
+        {/* mobile-only scope disclaimer line */}
+        <div className="bg-(--bg) px-4 pb-2 text-center font-hand text-sm text-(--ink-dim) md:hidden">
+          &amp; some other northern california
+        </div>
 
         {/* all three views stay mounted in absolute layers: zero layout shift */}
         <div className="relative min-h-0 flex-1">

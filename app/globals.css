@@ -118,10 +118,14 @@ body {
 button {
   cursor: pointer;
 }
-input,
-button,
-textarea {
-  font: inherit;
+/* in @layer base so Tailwind font-* utilities (e.g. font-hand) still win on
+   form controls; an unlayered rule here would override them */
+@layer base {
+  input,
+  button,
+  textarea {
+    font: inherit;
+  }
 }
 
 :focus-visible {
