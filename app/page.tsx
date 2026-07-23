@@ -56,7 +56,7 @@ export default function Home() {
             </h1>
             {/* scope disclaimer (desktop inline); mobile gets its own line below */}
             <span className="hidden truncate font-hand text-base text-(--ink-dim) md:inline">
-              &amp; some other northern california
+              &amp; some other norcal
             </span>
           </div>
           <div className="justify-self-center">
@@ -66,7 +66,7 @@ export default function Home() {
         </header>
         {/* mobile-only scope disclaimer line */}
         <div className="bg-(--bg) px-4 pb-2 text-center font-hand text-sm text-(--ink-dim) md:hidden">
-          &amp; some other northern california
+          &amp; some other norcal
         </div>
 
         {/* all three views stay mounted in absolute layers: zero layout shift */}
