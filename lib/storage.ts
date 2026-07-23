@@ -11,8 +11,19 @@ export interface UserComment {
   at: number; // epoch ms
 }
 
+export interface SpotRequest {
+  id: string;
+  name: string;
+  neighborhood: string;
+  note: string;
+  lat: number;
+  lng: number;
+  at: number;
+}
+
 const RATINGS_KEY = "bbc-ratings";
 const COMMENTS_KEY = "bbc-comments";
+const REQUESTS_KEY = "bbc-requests";
 
 function read<T>(key: string, fallback: T): T {
   if (typeof window === "undefined") return fallback;
@@ -59,4 +70,23 @@ export function addComment(burritoId: string, text: string): UserComment {
   all.push(comment);
   write(COMMENTS_KEY, all);
   return comment;
+}
+
+/** Spots users want fluffie to review next. Persisted locally for v1. */
+export function getRequests(): SpotRequest[] {
+  return read<SpotRequest[]>(REQUESTS_KEY, []);
+}
+
+export function addRequest(
+  r: Omit<SpotRequest, "id" | "at">
+): SpotRequest {
+  const all = read<SpotRequest[]>(REQUESTS_KEY, []);
+  const request: SpotRequest = {
+    ...r,
+    id: `r-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+    at: Date.now(),
+  };
+  all.push(request);
+  write(REQUESTS_KEY, all);
+  return request;
 }

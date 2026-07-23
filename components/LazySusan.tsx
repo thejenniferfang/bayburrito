@@ -167,6 +167,10 @@ export default function LazySusan({
     <div
       ref={containerRef}
       className="relative h-full w-full cursor-grab touch-none select-none overflow-hidden active:cursor-grabbing"
+      style={{
+        background:
+          "radial-gradient(120% 90% at 50% 120%, #3a2c1f 0%, var(--room) 45%, var(--room-edge) 100%)",
+      }}
       onPointerDown={onPointerDown}
       onPointerMove={onPointerMove}
       onPointerUp={onPointerUp}
@@ -206,35 +210,27 @@ function TableDisc({
   R: number;
   cy: number;
 }) {
-  const Rt = R * 1.32;
-  // the wood grain spins with the burritos, like a real turntable
+  const Rt = R * 1.34;
+  // the real wood top spins with the burritos, like a true lazy Susan
   const transform = useTransform(
     rotation,
     (r) => `translate(-50%, -50%) rotate(${r}deg)`
   );
   return (
-    <motion.div
+    <motion.img
+      src="/images/table.png"
+      alt=""
+      aria-hidden
+      draggable={false}
       className="pointer-events-none absolute left-1/2 rounded-full"
       style={{
         top: cy,
         width: Rt * 2,
         height: Rt * 2,
         transform,
-        background:
-          "radial-gradient(circle at 50% 50%, #3b3128 0%, #322a22 45%, #2c251e 70%, #211b16 100%), repeating-conic-gradient(from 0deg, rgba(0,0,0,0.06) 0deg 6deg, transparent 6deg 12deg)",
-        backgroundBlendMode: "multiply",
-        boxShadow:
-          "inset 0 0 0 2px #4a3e31, inset 0 0 0 18px #241e18, inset 0 0 0 20px #453a2d, inset 0 0 120px rgba(0,0,0,0.55), 0 -20px 60px rgba(0,0,0,0.45)",
+        filter: "drop-shadow(0 -14px 40px rgba(0,0,0,0.5))",
       }}
-    >
-      <div
-        className="absolute left-1/2 top-1/2 h-12 w-12 -translate-x-1/2 -translate-y-1/2 rounded-full"
-        style={{
-          background: "radial-gradient(circle at 40% 35%, #4a3e31, #2c251e)",
-          boxShadow: "inset 0 0 0 1px #574a39",
-        }}
-      />
-    </motion.div>
+    />
   );
 }
 

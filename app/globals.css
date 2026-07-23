@@ -1,48 +1,62 @@
 @import "tailwindcss";
 
 :root {
-  /* palette: warm dark editorial */
-  --bg: #131110;
-  --bg-raised: #1b1815;
-  --ink: #ede5d8;
-  --ink-dim: #9b917f;
-  --line: #2a251f;
+  /* warm editorial base (Horses LA chic) */
+  --bg: #efe4cf;
+  --bg-warm: #e8d9bd;
+  --surface: #f5eeddff;
+  --ink: #201a13;
+  --ink-dim: #6d6150;
+  --line: #d6c6a6;
+
+  /* dining-room backdrop for the table */
+  --room: #2a2018;
+  --room-edge: #17110c;
 
   /* notebook paper */
-  --paper: #f3ebdc;
-  --paper-shade: #e6dbc6;
-  --paper-line: #d8ccb6;
-  --paper-ink: #2b241a;
-  --paper-red: #b3543f;
+  --paper: #f4ecda;
+  --paper-shade: #e7dbc2;
+  --paper-line: #dccdae;
+  --paper-ink: #251f16;
+  --paper-red: #c14a33;
 
-  --accent: #c0803a;
-  --salsa: #c23b26;
+  /* funky food accents (Mala Project) */
+  --salsa: #d13a24;
+  --verde: #2f7d3a;
+  --marigold: #e2a01f;
+  --grape: #6d4fb3;
+  --hotpink: #e0356b;
 
-  /* tiers: S rich umber/ochre down to F slate */
-  --tier-s: #c0803a;
-  --tier-a: #9c6b35;
-  --tier-b: #7a6a4f;
-  --tier-c: #66665e;
-  --tier-d: #565960;
-  --tier-f: #454a52;
+  /* tier scale: hot -> cool, food-forward */
+  --tier-s: #d13a24;
+  --tier-a: #e0821e;
+  --tier-b: #cfa42a;
+  --tier-c: #5f8a3f;
+  --tier-d: #5f7f8a;
+  --tier-f: #8f8271;
 
-  /* strong custom easings */
   --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
   --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+  --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);
 }
 
 @theme inline {
   --color-bg: var(--bg);
-  --color-bg-raised: var(--bg-raised);
+  --color-bg-warm: var(--bg-warm);
+  --color-surface: var(--surface);
   --color-ink: var(--ink);
   --color-ink-dim: var(--ink-dim);
   --color-line: var(--line);
+  --color-room: var(--room);
   --color-paper: var(--paper);
   --color-paper-ink: var(--paper-ink);
-  --color-accent: var(--accent);
   --color-salsa: var(--salsa);
-  --font-serif: var(--font-instrument), Georgia, serif;
-  --font-sans: var(--font-geist-sans), system-ui, sans-serif;
+  --color-verde: var(--verde);
+  --color-marigold: var(--marigold);
+  --color-grape: var(--grape);
+  --color-hotpink: var(--hotpink);
+  --font-display: var(--font-space-mono), ui-monospace, monospace;
+  --font-mono: var(--font-geist-mono), ui-monospace, monospace;
   --font-hand: var(--font-hand), cursive;
 }
 
@@ -56,16 +70,16 @@ body {
 body {
   background: var(--bg);
   color: var(--ink);
-  font-family: var(--font-geist-sans), system-ui, sans-serif;
+  font-family: var(--font-geist-mono), ui-monospace, monospace;
   -webkit-font-smoothing: antialiased;
 }
 
 ::selection {
-  background: var(--accent);
+  background: var(--salsa);
   color: var(--bg);
 }
 
-/* film grain over everything */
+/* faint film grain */
 .grain::after {
   content: "";
   position: fixed;
@@ -74,25 +88,24 @@ body {
   height: 200%;
   pointer-events: none;
   z-index: 100;
-  opacity: 0.05;
+  opacity: 0.04;
+  mix-blend-mode: multiply;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 }
 
 /* notebook ruled paper */
 .paper {
   background-color: var(--paper);
-  background-image:
-    repeating-linear-gradient(
-      to bottom,
-      transparent 0,
-      transparent 31px,
-      var(--paper-line) 31px,
-      var(--paper-line) 32px
-    );
+  background-image: repeating-linear-gradient(
+    to bottom,
+    transparent 0,
+    transparent 31px,
+    var(--paper-line) 31px,
+    var(--paper-line) 32px
+  );
   color: var(--paper-ink);
 }
 
-/* every pressable thing answers back */
 .pressable {
   transition: transform 140ms var(--ease-out);
 }
@@ -103,15 +116,30 @@ body {
 button {
   cursor: pointer;
 }
-
 input,
-button {
+button,
+textarea {
   font: inherit;
 }
 
 :focus-visible {
-  outline: 2px solid var(--accent);
+  outline: 2px solid var(--salsa);
   outline-offset: 2px;
+}
+
+/* Leaflet: warm it up and drop the default chrome */
+.leaflet-container {
+  background: var(--bg-warm) !important;
+  font-family: var(--font-geist-mono), monospace !important;
+}
+.leaflet-control-attribution {
+  background: rgba(244, 236, 218, 0.7) !important;
+  font-size: 9px !important;
+}
+.leaflet-bar a {
+  background: var(--surface) !important;
+  color: var(--ink) !important;
+  border-color: var(--line) !important;
 }
 
 @media (prefers-reduced-motion: reduce) {

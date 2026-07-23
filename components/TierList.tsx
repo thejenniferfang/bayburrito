@@ -28,8 +28,8 @@ export default function TierList() {
             >
               <div className="flex flex-col items-start">
                 <span
-                  className="font-serif text-5xl leading-none md:text-7xl"
-                  style={{ color: TIER_COLORS[tier] }}
+                  className="text-5xl font-bold leading-none md:text-7xl"
+                  style={{ color: TIER_COLORS[tier], fontFamily: "var(--font-display)" }}
                 >
                   {tier}
                 </span>
@@ -49,7 +49,7 @@ export default function TierList() {
                     <button
                       key={b.id}
                       onClick={() => setOpen(b)}
-                      className="pressable group flex flex-col items-start rounded-sm border border-(--line) bg-(--bg-raised) p-3 text-left transition-colors duration-200 hover:border-(--ink-dim)/50"
+                      className="pressable group flex flex-col items-start rounded-md border border-(--line) bg-(--surface) p-3 text-left transition-colors duration-200 hover:border-(--salsa)"
                     >
                       <BurritoImage
                         src={b.imgUrl}
@@ -107,17 +107,20 @@ function DetailModal({
         animate={{ opacity: 1, scale: 1, y: 0 }}
         exit={{ opacity: 0, scale: 0.97, y: 4 }}
         transition={{ duration: 0.2, ease: [0.23, 1, 0.32, 1] }}
-        className="relative w-full max-w-md rounded-sm border border-(--line) bg-(--bg-raised) p-6 shadow-[0_30px_80px_rgba(0,0,0,0.6)]"
+        className="relative w-full max-w-md rounded-lg border border-(--line) bg-(--surface) p-6 shadow-[0_30px_80px_rgba(40,28,16,0.35)]"
       >
         <div className="flex items-start justify-between">
           <div>
             <span
-              className="font-serif text-4xl"
-              style={{ color: TIER_COLORS[burrito.tier] }}
+              className="text-4xl font-bold"
+              style={{ color: TIER_COLORS[burrito.tier], fontFamily: "var(--font-display)" }}
             >
               {burrito.tier}
             </span>
-            <h3 className="mt-1 font-serif text-2xl text-(--ink)">
+            <h3
+              className="mt-1 text-2xl font-bold text-(--ink)"
+              style={{ fontFamily: "var(--font-display)" }}
+            >
               {burrito.taqueria}
             </h3>
             <p className="text-sm text-(--ink-dim)">
@@ -129,7 +132,7 @@ function DetailModal({
         <p className="mt-4 font-hand text-2xl leading-8 text-(--ink)/85">
           &ldquo;{burrito.fluffieNotes}&rdquo;
         </p>
-        <p className="mt-3 text-[11px] uppercase tracking-[0.25em] text-(--accent)">
+        <p className="mt-3 text-[11px] uppercase tracking-[0.2em] text-(--salsa)">
           {burrito.beliRating !== undefined && (
             <>Beli {burrito.beliRating.toFixed(1)} / 10 &middot; </>
           )}

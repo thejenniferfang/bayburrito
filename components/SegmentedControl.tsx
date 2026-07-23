@@ -4,8 +4,9 @@ import { motion } from "motion/react";
 
 export type ViewKey = "susan" | "tiers" | "map";
 
+// "Bay Burrito" is the lazy-susan view. (Nobody here is named Susan.)
 const OPTIONS: { key: ViewKey; label: string }[] = [
-  { key: "susan", label: "Susan" },
+  { key: "susan", label: "Bay Burrito" },
   { key: "tiers", label: "Tiers" },
   { key: "map", label: "Map" },
 ];
@@ -21,7 +22,7 @@ export default function SegmentedControl({
     <div
       role="tablist"
       aria-label="View"
-      className="flex rounded-full border border-(--line) bg-(--bg-raised) p-1"
+      className="flex rounded-full border border-(--ink)/15 bg-(--surface) p-1"
     >
       {OPTIONS.map((opt) => {
         const active = value === opt.key;
@@ -31,18 +32,19 @@ export default function SegmentedControl({
             role="tab"
             aria-selected={active}
             onClick={() => onChange(opt.key)}
-            className={`pressable relative rounded-full px-4 py-1.5 text-[11px] font-medium uppercase tracking-[0.2em] transition-colors duration-200 md:px-5 ${
+            className={`pressable relative rounded-full px-3.5 py-1.5 text-[11px] font-bold uppercase tracking-[0.14em] transition-colors duration-200 md:px-4 ${
               active ? "text-(--bg)" : "text-(--ink-dim) hover:text-(--ink)"
             }`}
+            style={{ fontFamily: "var(--font-mono)" }}
           >
             {active && (
               <motion.span
                 layoutId="segment-pill"
-                className="absolute inset-0 rounded-full bg-(--ink)"
-                transition={{ type: "spring", duration: 0.4, bounce: 0.15 }}
+                className="absolute inset-0 rounded-full bg-(--salsa)"
+                transition={{ type: "spring", duration: 0.4, bounce: 0.18 }}
               />
             )}
-            <span className="relative">{opt.label}</span>
+            <span className="relative whitespace-nowrap">{opt.label}</span>
           </button>
         );
       })}

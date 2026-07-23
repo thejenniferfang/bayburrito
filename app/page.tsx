@@ -45,13 +45,16 @@ export default function Home() {
         }}
         transition={{ duration: 0.5, ease: [0.23, 1, 0.32, 1] }}
       >
-        <header className="flex items-center justify-between gap-3 border-b border-(--line) px-5 py-3 md:px-8">
-          <div className="flex min-w-0 items-baseline gap-3">
-            <h1 className="truncate font-serif text-lg tracking-wide text-(--ink) md:text-2xl">
-              The Bay Area Burrito Challenge
+        <header className="flex items-center justify-between gap-3 border-b border-(--line) bg-(--bg) px-4 py-3 md:px-8">
+          <div className="flex min-w-0 items-center gap-3">
+            <h1
+              className="truncate text-base font-bold uppercase leading-none tracking-[0.02em] text-(--ink) md:text-xl"
+              style={{ fontFamily: "var(--font-display)" }}
+            >
+              Bay Burrito<span className="text-(--salsa)">.</span>Challenge
             </h1>
-            <span className="hidden shrink-0 font-hand text-lg text-(--accent) sm:block">
-              eaten by hand, est. 2026
+            <span className="hidden shrink-0 font-hand text-xl text-(--salsa) sm:block">
+              eaten by hand
             </span>
           </div>
           <SegmentedControl value={view} onChange={setView} />
@@ -80,7 +83,7 @@ export default function Home() {
           </ViewLayer>
 
           <ViewLayer active={view === "map"}>
-            <BayMap />
+            <BayMap active={view === "map"} />
           </ViewLayer>
         </div>
       </motion.main>
@@ -100,7 +103,9 @@ function ViewLayer({
       className="absolute inset-0"
       style={{
         opacity: active ? 1 : 0,
-        transform: active ? "scale(1)" : "scale(0.985)",
+        // "none" (not scale(1)) on the active layer: a lingering transform
+        // creates a compositing context that makes Leaflet tiles paint lazily
+        transform: active ? "none" : "scale(0.985)",
         transition:
           "opacity 200ms cubic-bezier(0.23,1,0.32,1), transform 200ms cubic-bezier(0.23,1,0.32,1)",
         pointerEvents: active ? "auto" : "none",

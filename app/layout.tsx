@@ -1,17 +1,16 @@
 import type { Metadata } from "next";
-import { Geist, Instrument_Serif } from "next/font/google";
+import { Geist_Mono, Space_Mono } from "next/font/google";
 import localFont from "next/font/local";
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const geistMono = Geist_Mono({
+  variable: "--font-geist-mono",
   subsets: ["latin"],
 });
 
-const instrument = Instrument_Serif({
-  variable: "--font-instrument",
-  weight: "400",
-  style: ["normal", "italic"],
+const spaceMono = Space_Mono({
+  variable: "--font-space-mono",
+  weight: ["400", "700"],
   subsets: ["latin"],
 });
 
@@ -21,9 +20,9 @@ const handOfJen = localFont({
 });
 
 export const metadata: Metadata = {
-  title: "Bay Area Burrito Challenge",
+  title: "Bay Burrito Challenge",
   description:
-    "The BBC. Every Bay Area burrito, eaten, ranked, and written up by hand.",
+    "Every Bay Area burrito, eaten, ranked, and written up by hand.",
 };
 
 export default function RootLayout({
@@ -34,7 +33,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${instrument.variable} ${handOfJen.variable} grain antialiased`}
+        className={`${geistMono.variable} ${spaceMono.variable} ${handOfJen.variable} grain antialiased`}
       >
         {children}
       </body>

@@ -1,175 +1,336 @@
 "use client";
 
-import { useState } from "react";
-import { AnimatePresence, motion } from "motion/react";
-import { BURRITOS, TIER_COLORS, type Burrito } from "@/data/burritos";
+import { useEffect, useRef, useState } from "react";
+import type { Map as LMap, Marker } from "leaflet";
+import "leaflet/dist/leaflet.css";
+import { BURRITOS, TIER_COLORS } from "@/data/burritos";
+import { addRequest, getRequests, type SpotRequest } from "@/lib/storage";
 
-// map projection bounds (roughly Marin down to Santa Cruz)
-const MIN_LNG = -122.75;
-const MAX_LNG = -121.65;
-const MIN_LAT = 36.9;
-const MAX_LAT = 38.05;
-const W = 440;
-const H = 560;
+const esc = (s: string) =>
+  s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/"/g, "&quot;");
 
-const px = (lng: number) => ((lng - MIN_LNG) / (MAX_LNG - MIN_LNG)) * W;
-const py = (lat: number) => ((MAX_LAT - lat) / (MAX_LAT - MIN_LAT)) * H;
+// a colored pin as an inline SVG divIcon (no marker image assets to 404)
+function pinHtml(color: string, requested = false) {
+  const ring = requested ? `stroke='#fff' stroke-width='2' stroke-dasharray='3 2'` : "";
+  return `<svg width="26" height="34" viewBox="0 0 26 34" xmlns="http://www.w3.org/2000/svg">
+    <path d="M13 33C13 33 24 20.5 24 12A11 11 0 1 0 2 12C2 20.5 13 33 13 33Z"
+      fill="${color}" stroke="rgba(0,0,0,0.25)" stroke-width="1"/>
+    <circle cx="13" cy="12" r="4.5" fill="#fff" ${ring}/>
+  </svg>`;
+}
 
-/** Hand-sketched Bay Area with taqueria pins and a notes drawer. */
-export default function BayMap() {
-  const [open, setOpen] = useState<Burrito | null>(null);
+export default function BayMap({ active = true }: { active?: boolean }) {
+  const holder = useRef<HTMLDivElement>(null);
+  const mapRef = useRef<LMap | null>(null);
+  const boundsRef = useRef<[number, number][]>([]);
+  const reqLayerRef = useRef<Marker[]>([]);
+  const roRef = useRef<ResizeObserver | null>(null);
+  const LRef = useRef<typeof import("leaflet") | null>(null);
+  const [placing, setPlacing] = useState(false);
+  const [pending, setPending] = useState<{ lat: number; lng: number } | null>(null);
+  const pendingMarker = useRef<Marker | null>(null);
+  const [form, setForm] = useState({ name: "", neighborhood: "", note: "" });
+  const [requests, setRequests] = useState<SpotRequest[]>([]);
+
+  // init the map the first time this view opens. Initializing while the
+  // container is actually visible avoids Leaflet caching a zero/stale
+  // viewport (which paints only the center tiles).
+  useEffect(() => {
+    if (!active || mapRef.current) return;
+    let cancelled = false;
+    (async () => {
+      const L = (await import("leaflet")).default;
+      if (cancelled || !holder.current || mapRef.current) return;
+      LRef.current = L;
+
+      const map = L.map(holder.current, {
+        zoomControl: true,
+        attributionControl: true,
+        scrollWheelZoom: true,
+        // tiles that finish loading while the layer is mid-transition can
+        // get stuck at opacity 0; disabling the fade paints them on load
+        fadeAnimation: false,
+      });
+      mapRef.current = map;
+
+      // warm, low-key basemap. no API key needed.
+      L.tileLayer(
+        "https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png",
+        {
+          attribution:
+            '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>',
+          maxZoom: 19,
+        }
+      ).addTo(map);
+
+      // fluffie's reviewed spots
+      const pts: [number, number][] = [];
+      for (const b of BURRITOS) {
+        if (!b.lat || !b.lng) continue;
+        pts.push([b.lat, b.lng]);
+        const color = getComputedStyle(document.documentElement)
+          .getPropertyValue(TIER_COLORS[b.tier].replace(/var\((.+)\)/, "$1"))
+          .trim() || "#d13a24";
+        L.marker([b.lat, b.lng], {
+          icon: L.divIcon({
+            html: pinHtml(color),
+            className: "",
+            iconSize: [26, 34],
+            iconAnchor: [13, 33],
+            popupAnchor: [0, -30],
+          }),
+        })
+          .addTo(map)
+          .bindPopup(
+            `<div style="font-family:var(--font-mono)">
+              <div style="font-weight:700;color:${color}">${esc(b.tier)} &middot; ${esc(b.taqueria)}</div>
+              <div style="font-size:11px;opacity:.7">${esc(b.neighborhood)}</div>
+              <div style="font-family:var(--font-hand);font-size:16px;margin-top:4px;max-width:200px">&ldquo;${esc(b.fluffieNotes)}&rdquo;</div>
+              ${b.videoUrl ? `<a href="${b.videoUrl}" target="_blank" rel="noreferrer" style="font-size:11px;color:#d13a24">watch the review &rarr;</a>` : ""}
+            </div>`
+          );
+      }
+      boundsRef.current = pts;
+
+      // Fit only once the container reports real pixel dimensions. A
+      // ResizeObserver fires immediately on observe with the laid-out size,
+      // which dodges the "measured zero -> street-zoom, center tiles only"
+      // failure of fitting synchronously right after L.map().
+      // Frame the core Bay Area (SF -> Santa Cruz -> Berkeley); a couple of
+      // spots geocode out to Sacramento/Tahoe, and a fixed box keeps those
+      // from dragging the view into the Central Valley. Users can pan.
+      let fitted = false;
+      const ro = new ResizeObserver(() => {
+        if (!holder.current) return;
+        if (holder.current.clientWidth < 2 || holder.current.clientHeight < 2)
+          return;
+        map.invalidateSize();
+        if (!fitted) {
+          fitted = true;
+          map.fitBounds(
+            [
+              [36.9, -122.7],
+              [38.05, -121.75],
+            ],
+            { padding: [20, 20] }
+          );
+        }
+      });
+      ro.observe(holder.current!);
+      roRef.current = ro;
+
+      // user requests from a prior session
+      setRequests(getRequests());
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [active]);
+
+  // when the map view becomes active, recompute size and refit (Leaflet
+  // renders a stale/zero viewport if it initialized while its layer was
+  // stacked behind another view)
+  // Nudge tiles to paint once the view-layer opacity/scale transition
+  // (~200ms) settles. invalidateSize alone sizes correctly but tiles only
+  // reliably paint after a real resize event fires post-transition.
+  useEffect(() => {
+    if (!active) return;
+    const map = mapRef.current;
+    if (!map) return;
+    const timers = [250, 600, 1000].map((ms) =>
+      setTimeout(() => {
+        window.dispatchEvent(new Event("resize"));
+        map.invalidateSize();
+      }, ms)
+    );
+    return () => timers.forEach(clearTimeout);
+  }, [active]);
+
+  // final teardown on unmount only
+  useEffect(
+    () => () => {
+      roRef.current?.disconnect();
+      mapRef.current?.remove();
+      mapRef.current = null;
+    },
+    []
+  );
+
+  // render request markers whenever the list changes
+  useEffect(() => {
+    const L = LRef.current;
+    const map = mapRef.current;
+    if (!L || !map) return;
+    reqLayerRef.current.forEach((m) => m.remove());
+    reqLayerRef.current = requests.map((r) =>
+      L.marker([r.lat, r.lng], {
+        icon: L.divIcon({
+          html: pinHtml("#e0356b", true),
+          className: "",
+          iconSize: [26, 34],
+          iconAnchor: [13, 33],
+          popupAnchor: [0, -30],
+        }),
+      })
+        .addTo(map)
+        .bindPopup(
+          `<div style="font-family:var(--font-mono)">
+            <div style="font-weight:700;color:#e0356b">REQUESTED</div>
+            <div style="font-weight:700">${esc(r.name)}</div>
+            <div style="font-size:11px;opacity:.7">${esc(r.neighborhood)}</div>
+            ${r.note ? `<div style="font-family:var(--font-hand);font-size:16px;margin-top:4px;max-width:200px">${esc(r.note)}</div>` : ""}
+          </div>`
+        )
+    );
+  }, [requests]);
+
+  // click-to-place while in "request" mode
+  useEffect(() => {
+    const L = LRef.current;
+    const map = mapRef.current;
+    if (!L || !map) return;
+    const onClick = (e: { latlng: { lat: number; lng: number } }) => {
+      if (!placing) return;
+      const { lat, lng } = e.latlng;
+      setPending({ lat, lng });
+      pendingMarker.current?.remove();
+      pendingMarker.current = L.marker([lat, lng], {
+        icon: L.divIcon({
+          html: pinHtml("#e0356b", true),
+          className: "",
+          iconSize: [26, 34],
+          iconAnchor: [13, 33],
+        }),
+        opacity: 0.7,
+      }).addTo(map);
+    };
+    map.on("click", onClick);
+    return () => {
+      map.off("click", onClick);
+    };
+  }, [placing]);
+
+  const submit = () => {
+    if (!pending || !form.name.trim()) return;
+    const saved = addRequest({
+      name: form.name.trim(),
+      neighborhood: form.neighborhood.trim(),
+      note: form.note.trim(),
+      lat: pending.lat,
+      lng: pending.lng,
+    });
+    setRequests((prev) => [...prev, saved]);
+    pendingMarker.current?.remove();
+    pendingMarker.current = null;
+    setPending(null);
+    setPlacing(false);
+    setForm({ name: "", neighborhood: "", note: "" });
+  };
+
+  const cancel = () => {
+    pendingMarker.current?.remove();
+    pendingMarker.current = null;
+    setPending(null);
+    setPlacing(false);
+    setForm({ name: "", neighborhood: "", note: "" });
+  };
 
   return (
-    <div className="relative h-full w-full overflow-hidden">
-      <div className="absolute inset-0 flex items-center justify-center p-6">
-        <div className="relative h-full max-h-full" style={{ aspectRatio: `${W}/${H}` }}>
-          <svg
-            viewBox={`0 0 ${W} ${H}`}
-            className="h-full w-full"
-            aria-label="Hand-drawn map of the San Francisco Bay Area"
+    <div className="relative h-full w-full">
+      <div ref={holder} className="h-full w-full" />
+
+      {/* request-a-spot control */}
+      {!placing && !pending && (
+        <button
+          onClick={() => setPlacing(true)}
+          className="pressable absolute left-1/2 top-4 z-[1000] -translate-x-1/2 rounded-full bg-(--salsa) px-5 py-2.5 text-[12px] font-bold uppercase tracking-[0.12em] text-white shadow-[0_8px_24px_rgba(40,28,16,0.3)]"
+          style={{ fontFamily: "var(--font-mono)" }}
+        >
+          + Request a spot for fluffie
+        </button>
+      )}
+
+      {placing && !pending && (
+        <div className="absolute left-1/2 top-4 z-[1000] flex -translate-x-1/2 items-center gap-3 rounded-full border border-(--line) bg-(--surface) px-4 py-2.5 shadow-lg">
+          <span
+            className="text-[12px] font-bold uppercase tracking-[0.1em] text-(--ink)"
+            style={{ fontFamily: "var(--font-mono)" }}
           >
-            {/* the bay */}
-            <path
-              d="M118 158
-                 Q140 148 158 138
-                 Q150 108 162 84 Q178 62 204 58 Q232 56 244 74 Q252 90 240 102
-                 Q222 96 210 108 Q200 122 208 142
-                 Q218 168 224 196 Q232 232 250 266 Q270 302 292 338
-                 Q314 372 334 410 Q348 438 352 462
-                 Q346 478 330 470 Q314 452 298 424
-                 Q276 388 254 352 Q232 316 214 278 Q198 242 184 210
-                 Q170 182 148 170 Q130 164 118 158 Z"
-              fill="var(--bg-raised)"
-              stroke="var(--ink-dim)"
-              strokeWidth="1.6"
-              strokeLinecap="round"
-              opacity="0.9"
-            />
-            {/* pacific coastline */}
-            <path
-              d="M96 0 Q104 28 96 54 Q86 84 98 112 Q108 134 104 152
-                 M96 178 Q84 210 92 244 Q102 274 92 306 Q80 342 90 378 Q100 410 92 444 Q84 480 94 516 Q100 538 96 560"
-              fill="none"
-              stroke="var(--ink-dim)"
-              strokeWidth="1.6"
-              strokeLinecap="round"
-              opacity="0.65"
-            />
-            {/* golden gate */}
-            <path
-              d="M104 152 Q112 156 118 158 M148 170 Q142 176 138 184"
-              fill="none"
-              stroke="var(--ink-dim)"
-              strokeWidth="1.6"
-              strokeLinecap="round"
-              opacity="0.65"
-            />
-            <path
-              d="M108 154 L146 168"
-              stroke="var(--salsa)"
-              strokeWidth="2"
-              strokeDasharray="4 3"
-              opacity="0.7"
-            />
-            {/* hand labels */}
-            <g
-              className="font-hand"
-              fill="var(--ink-dim)"
-              fontSize="17"
-              opacity="0.8"
-            >
-              <text x="24" y="230" transform="rotate(-78 24 230)">
-                the pacific
-              </text>
-              <text x="124" y="204">SF</text>
-              <text x="238" y="140">Berkeley</text>
-              <text x="252" y="222">Oakland</text>
-              <text x="330" y="500">San Jose</text>
-              <text x="236" y="300" transform="rotate(48 236 300)" opacity="0.5">
-                the bay
-              </text>
-            </g>
-          </svg>
-
-          {/* pins as HTML so hit targets are honest */}
-          {BURRITOS.map((b) => (
-            <button
-              key={b.id}
-              onClick={() => setOpen(b)}
-              aria-label={`${b.taqueria}, ${b.neighborhood}`}
-              className="pressable group absolute -translate-x-1/2 -translate-y-1/2"
-              style={{
-                left: `${(px(b.lng) / W) * 100}%`,
-                top: `${(py(b.lat) / H) * 100}%`,
-              }}
-            >
-              <span
-                className="block h-3.5 w-3.5 rounded-full border-2 border-(--bg) transition-transform duration-150 group-hover:scale-125"
-                style={{
-                  background: TIER_COLORS[b.tier],
-                  transitionTimingFunction: "cubic-bezier(0.23,1,0.32,1)",
-                  boxShadow: "0 0 0 1px var(--ink-dim)",
-                }}
-              />
-              <span className="pointer-events-none absolute left-1/2 top-full mt-1 -translate-x-1/2 whitespace-nowrap font-hand text-lg text-(--ink) opacity-0 transition-opacity duration-150 group-hover:opacity-100">
-                {b.taqueria}
-              </span>
-            </button>
-          ))}
+            tap the map where it is
+          </span>
+          <button
+            onClick={cancel}
+            className="pressable text-[11px] uppercase tracking-wider text-(--ink-dim) hover:text-(--salsa)"
+          >
+            cancel
+          </button>
         </div>
-      </div>
+      )}
 
-      <AnimatePresence>
-        {open && (
-          <>
-            <motion.button
-              aria-label="Close drawer"
-              className="absolute inset-0 z-10 bg-black/30"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.15 }}
-              onClick={() => setOpen(null)}
-            />
-            <motion.aside
-              className="paper absolute inset-y-0 right-0 z-20 w-[min(85vw,320px)] p-6 shadow-[-20px_0_60px_rgba(0,0,0,0.45)]"
-              initial={{ transform: "translateX(100%)" }}
-              animate={{ transform: "translateX(0%)" }}
-              exit={{ transform: "translateX(100%)" }}
-              transition={{ duration: 0.28, ease: [0.32, 0.72, 0, 1] }}
-              role="dialog"
-              aria-label={open.taqueria}
+      {/* request form once a location is chosen */}
+      {pending && (
+        <div
+          className="absolute left-1/2 top-4 z-[1000] w-[min(90vw,340px)] -translate-x-1/2 rounded-lg border border-(--line) bg-(--surface) p-4 shadow-[0_16px_48px_rgba(40,28,16,0.35)]"
+          style={{ fontFamily: "var(--font-mono)" }}
+        >
+          <p className="mb-3 text-[12px] font-bold uppercase tracking-[0.12em] text-(--hotpink)">
+            Request a burrito spot
+          </p>
+          <input
+            autoFocus
+            value={form.name}
+            onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
+            onKeyDown={(e) => e.key === "Enter" && submit()}
+            placeholder="taqueria name *"
+            className="mb-2 w-full rounded-md border border-(--line) bg-(--bg) px-3 py-2 text-sm text-(--ink) placeholder:text-(--ink-dim)/60 focus:border-(--salsa) focus:outline-none"
+          />
+          <input
+            value={form.neighborhood}
+            onChange={(e) =>
+              setForm((f) => ({ ...f, neighborhood: e.target.value }))
+            }
+            placeholder="neighborhood"
+            className="mb-2 w-full rounded-md border border-(--line) bg-(--bg) px-3 py-2 text-sm text-(--ink) placeholder:text-(--ink-dim)/60 focus:border-(--salsa) focus:outline-none"
+          />
+          <input
+            value={form.note}
+            onChange={(e) => setForm((f) => ({ ...f, note: e.target.value }))}
+            onKeyDown={(e) => e.key === "Enter" && submit()}
+            placeholder="why should he go? (optional)"
+            className="mb-3 w-full rounded-md border border-(--line) bg-(--bg) px-3 py-2 text-sm text-(--ink) placeholder:text-(--ink-dim)/60 focus:border-(--salsa) focus:outline-none"
+          />
+          <div className="flex gap-2">
+            <button
+              onClick={submit}
+              disabled={!form.name.trim()}
+              className="pressable flex-1 rounded-md bg-(--salsa) py-2 text-[11px] font-bold uppercase tracking-[0.12em] text-white disabled:opacity-40"
             >
-              <span
-                className="font-serif text-4xl"
-                style={{ color: TIER_COLORS[open.tier] }}
-              >
-                {open.tier}
-              </span>
-              <h3 className="mt-2 font-hand text-4xl text-(--paper-ink)">
-                {open.taqueria}
-              </h3>
-              <p className="font-hand text-xl text-(--paper-ink)/60">
-                {open.neighborhood} &middot; {open.name}
-              </p>
-              <p className="mt-4 font-hand text-2xl leading-8 text-(--paper-ink)/85">
-                &ldquo;{open.fluffieNotes}&rdquo;
-              </p>
-              {open.beliRating !== undefined && (
-                <p className="mt-4 text-[11px] uppercase tracking-[0.25em] text-(--salsa)">
-                  Beli {open.beliRating.toFixed(1)} / 10
-                </p>
-              )}
-              <button
-                onClick={() => setOpen(null)}
-                className="pressable absolute right-4 top-4 text-[11px] uppercase tracking-[0.2em] text-(--paper-ink)/50 transition-colors duration-150 hover:text-(--paper-ink)"
-              >
-                Close
-              </button>
-            </motion.aside>
-          </>
-        )}
-      </AnimatePresence>
+              Add to map
+            </button>
+            <button
+              onClick={cancel}
+              className="pressable rounded-md border border-(--line) px-3 py-2 text-[11px] uppercase tracking-wider text-(--ink-dim) hover:text-(--ink)"
+            >
+              cancel
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* legend */}
+      <div
+        className="absolute bottom-6 left-4 z-[900] flex flex-col gap-1 rounded-md border border-(--line) bg-(--surface)/90 px-3 py-2 text-[10px] uppercase tracking-[0.1em] text-(--ink-dim)"
+        style={{ fontFamily: "var(--font-mono)" }}
+      >
+        <span className="flex items-center gap-2">
+          <span className="inline-block h-2.5 w-2.5 rounded-full bg-(--salsa)" />
+          reviewed by fluffie
+        </span>
+        <span className="flex items-center gap-2">
+          <span className="inline-block h-2.5 w-2.5 rounded-full bg-(--hotpink)" />
+          requested {requests.length > 0 ? `(${requests.length})` : ""}
+        </span>
+      </div>
     </div>
   );
 }
