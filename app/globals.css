@@ -153,7 +153,7 @@ textarea {
   border-radius: 50% !important;
   background: var(--surface) !important;
   color: var(--ink) !important;
-  box-shadow: 0 2px 8px rgba(40, 28, 16, 0.22) !important;
+  box-shadow: none !important;
 }
 
 @media (prefers-reduced-motion: reduce) {

@@ -14,6 +14,11 @@ import {
 const esc = (s: string) =>
   s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/"/g, "&quot;");
 
+type Suggestion = { name: string; city: string; lat: number; lng: number };
+
+// Bay Area bounding box (west, east, south, north) for biasing + filtering
+const BAY = { w: -122.75, e: -121.55, s: 36.85, n: 38.1 };
+
 // a colored pin as an inline SVG divIcon (no marker image assets to 404)
 function pinHtml(color: string, requested = false) {
   const ring = requested ? `stroke='#fff' stroke-width='2' stroke-dasharray='3 2'` : "";
@@ -34,8 +39,8 @@ export default function BayMap({ active = true }: { active?: boolean }) {
   const [searching, setSearching] = useState(false);
   const [query, setQuery] = useState("");
   const [note, setNote] = useState("");
-  const [busy, setBusy] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
+  const [loadingSug, setLoadingSug] = useState(false);
   const [requests, setRequests] = useState<SpotRequest[]>([]);
 
   // init the map the first time this view opens. Initializing while the
@@ -210,64 +215,72 @@ export default function BayMap({ active = true }: { active?: boolean }) {
     return () => el.removeEventListener("click", onClick);
   }, []);
 
-  // Beli-style: type the place name, we geocode it and drop the pin.
-  const search = async () => {
+  // Autocomplete: as you type, suggest Bay Area places (Photon geocoder,
+  // location-biased to SF, filtered to the Bay bounding box).
+  useEffect(() => {
     const q = query.trim();
-    if (!q || busy) return;
-    setBusy(true);
-    setError(null);
-    try {
-      // Restrict results to the Bay Area: bounded=1 confines Nominatim to
-      // the viewbox, and we double-check the returned point is inside it.
-      const BAY = { w: -122.75, e: -121.55, s: 36.85, n: 38.1 };
-      const base =
-        "https://nominatim.openstreetmap.org/search?format=json&limit=5&addressdetails=1" +
-        `&viewbox=${BAY.w},${BAY.n},${BAY.e},${BAY.s}&bounded=1`;
-      type Hit = { lat: string; lon: string; address?: Record<string, string> };
-      const inBay = (h: Hit) => {
-        const la = +h.lat,
-          lo = +h.lon;
-        return la >= BAY.s && la <= BAY.n && lo >= BAY.w && lo <= BAY.e;
-      };
-      let hit: Hit | undefined;
-      for (const variant of [q, `${q}, California`]) {
-        const res = await fetch(`${base}&q=${encodeURIComponent(variant)}`, {
-          headers: { Accept: "application/json" },
-        });
-        hit = ((await res.json()) as Hit[]).find(inBay);
-        if (hit) break;
-      }
-      if (!hit) {
-        setError("couldn't find that in the Bay Area. try adding the city.");
-        setBusy(false);
-        return;
-      }
-      const a = hit.address ?? {};
-      const neighborhood =
-        a.city || a.town || a.suburb || a.neighbourhood || a.county || "";
-      const saved = addRequest({
-        name: q,
-        neighborhood,
-        note: note.trim(),
-        lat: +(+hit.lat).toFixed(5),
-        lng: +(+hit.lon).toFixed(5),
-      });
-      setRequests((prev) => [...prev, saved]);
-      mapRef.current?.setView([+hit.lat, +hit.lon], 14);
-      setQuery("");
-      setNote("");
-      setSearching(false);
-    } catch {
-      setError("search failed, try again");
+    if (!searching || q.length < 3) {
+      setSuggestions([]);
+      return;
     }
-    setBusy(false);
+    setLoadingSug(true);
+    const id = setTimeout(async () => {
+      try {
+        const res = await fetch(
+          `https://photon.komoot.io/api/?q=${encodeURIComponent(q)}` +
+            "&lat=37.77&lon=-122.42&limit=8&lang=en"
+        );
+        const data = (await res.json()) as {
+          features: Array<{
+            geometry: { coordinates: [number, number] };
+            properties: Record<string, string>;
+          }>;
+        };
+        const sug: Suggestion[] = (data.features ?? [])
+          .map((f) => {
+            const p = f.properties;
+            return {
+              name: p.name || p.street || q,
+              city: p.city || p.town || p.district || p.state || "",
+              lat: f.geometry.coordinates[1],
+              lng: f.geometry.coordinates[0],
+            };
+          })
+          .filter(
+            (s) =>
+              s.lat >= BAY.s &&
+              s.lat <= BAY.n &&
+              s.lng >= BAY.w &&
+              s.lng <= BAY.e
+          )
+          .slice(0, 6);
+        setSuggestions(sug);
+      } catch {
+        setSuggestions([]);
+      }
+      setLoadingSug(false);
+    }, 250);
+    return () => clearTimeout(id);
+  }, [query, searching]);
+
+  const pick = (s: Suggestion) => {
+    const saved = addRequest({
+      name: s.name,
+      neighborhood: s.city,
+      note: note.trim(),
+      lat: +s.lat.toFixed(5),
+      lng: +s.lng.toFixed(5),
+    });
+    setRequests((prev) => [...prev, saved]);
+    mapRef.current?.setView([s.lat, s.lng], 15);
+    cancel();
   };
 
   const cancel = () => {
     setSearching(false);
     setQuery("");
     setNote("");
-    setError(null);
+    setSuggestions([]);
   };
 
   return (
@@ -287,46 +300,73 @@ export default function BayMap({ active = true }: { active?: boolean }) {
 
       {searching && (
         <div
-          className="absolute left-1/2 top-4 z-[1000] w-[min(92vw,360px)] -translate-x-1/2 rounded-2xl bg-(--surface) p-4 shadow-[0_16px_48px_rgba(40,28,16,0.35)]"
+          className="absolute left-1/2 top-4 z-[1000] w-[min(92vw,380px)] -translate-x-1/2 rounded-2xl bg-(--surface) p-4 shadow-[0_16px_48px_rgba(40,28,16,0.35)]"
           style={{ fontFamily: "var(--font-hand)" }}
         >
-          <p className="mb-2 text-xl leading-none text-(--olive)">
-            request a spot for fluffie
-          </p>
-          <input
-            autoFocus
-            value={query}
-            onChange={(e) => {
-              setQuery(e.target.value);
-              setError(null);
-            }}
-            onKeyDown={(e) => e.key === "Enter" && search()}
-            placeholder="place name, e.g. La Taqueria SF"
-            className="mb-2 w-full rounded-lg bg-(--bg) px-3 py-2 text-lg text-(--ink) placeholder:text-(--ink-dim)/60 focus:outline-none focus:ring-2 focus:ring-(--olive)"
-          />
-          <input
-            value={note}
-            onChange={(e) => setNote(e.target.value)}
-            onKeyDown={(e) => e.key === "Enter" && search()}
-            placeholder="why should he go? (optional)"
-            className="mb-2 w-full rounded-lg bg-(--bg) px-3 py-2 text-lg text-(--ink) placeholder:text-(--ink-dim)/60 focus:outline-none focus:ring-2 focus:ring-(--olive)"
-          />
-          {error && <p className="mb-2 text-base text-(--salsa)">{error}</p>}
-          <div className="flex gap-2">
-            <button
-              onClick={search}
-              disabled={!query.trim() || busy}
-              className="pressable flex-1 rounded-lg bg-(--olive) py-2 text-lg text-white disabled:opacity-40"
-            >
-              {busy ? "searching..." : "find it & add"}
-            </button>
+          <div className="mb-2 flex items-baseline justify-between">
+            <p className="text-xl leading-none text-(--olive)">
+              request a spot for fluffie
+            </p>
             <button
               onClick={cancel}
-              className="pressable rounded-lg px-3 py-2 text-lg text-(--ink-dim) hover:text-(--ink)"
+              className="pressable text-lg text-(--ink-dim) hover:text-(--ink)"
             >
               cancel
             </button>
           </div>
+          <input
+            autoFocus
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" && suggestions[0]) pick(suggestions[0]);
+            }}
+            placeholder="start typing a taqueria..."
+            className="w-full rounded-lg bg-(--bg) px-3 py-2 text-lg text-(--ink) placeholder:text-(--ink-dim)/60 focus:outline-none focus:ring-2 focus:ring-(--olive)"
+          />
+
+          {/* live suggestions */}
+          {query.trim().length >= 3 && (
+            <div className="mt-1 max-h-56 overflow-y-auto rounded-lg">
+              {loadingSug && suggestions.length === 0 && (
+                <p className="px-3 py-2 text-base text-(--ink-dim)">
+                  searching...
+                </p>
+              )}
+              {!loadingSug && suggestions.length === 0 && (
+                <p className="px-3 py-2 text-base text-(--ink-dim)">
+                  no bay area matches. add the city, or it may not be mapped
+                  yet.
+                </p>
+              )}
+              {suggestions.map((s, i) => (
+                <button
+                  key={`${s.lat},${s.lng},${i}`}
+                  onClick={() => pick(s)}
+                  className="pressable flex w-full flex-col items-start rounded-lg px-3 py-1.5 text-left hover:bg-(--olive)/15"
+                >
+                  <span className="text-lg leading-tight text-(--ink)">
+                    {s.name}
+                  </span>
+                  {s.city && (
+                    <span className="text-sm leading-tight text-(--ink-dim)">
+                      {s.city}
+                    </span>
+                  )}
+                </button>
+              ))}
+            </div>
+          )}
+
+          <input
+            value={note}
+            onChange={(e) => setNote(e.target.value)}
+            placeholder="why should he go? (optional)"
+            className="mt-2 w-full rounded-lg bg-(--bg) px-3 py-2 text-lg text-(--ink) placeholder:text-(--ink-dim)/60 focus:outline-none focus:ring-2 focus:ring-(--olive)"
+          />
+          <p className="mt-1.5 text-sm text-(--ink-dim)/70">
+            pick a match above to add it to the map
+          </p>
         </div>
       )}
 
