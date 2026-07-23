@@ -5,6 +5,7 @@ import { AnimatePresence, motion } from "motion/react";
 import { TIER_COLORS, type Burrito } from "@/data/burritos";
 import {
   addComment,
+  clearMyRating,
   getComments,
   getCommunityRating,
   setMyRating,
@@ -136,6 +137,13 @@ function RatingBar({ burritoId }: { burritoId: string }) {
     setC(fresh);
   };
 
+  const clear = async () => {
+    setC((prev) => ({ ...prev, mine: null })); // optimistic
+    await clearMyRating(burritoId);
+    const fresh = await getCommunityRating(burritoId);
+    setC(fresh);
+  };
+
   const setFromEvent = (clientX: number) => {
     const el = trackRef.current;
     if (!el) return;
@@ -155,15 +163,25 @@ function RatingBar({ burritoId }: { burritoId: string }) {
         >
           your rating
         </span>
-        <motion.span
-          key={value ?? "none"}
-          initial={{ scale: 1.4 }}
-          animate={{ scale: 1 }}
-          transition={{ type: "spring", stiffness: 420, damping: 14 }}
-          className="inline-block font-hand text-2xl leading-none text-(--salsa)"
-        >
-          {value === null ? "?" : value}/10
-        </motion.span>
+        <span className="flex items-baseline gap-2">
+          {value !== null && (
+            <button
+              onClick={clear}
+              className="pressable font-hand text-base leading-none text-(--paper-ink)/45 transition-colors duration-150 hover:text-(--salsa)"
+            >
+              clear
+            </button>
+          )}
+          <motion.span
+            key={value ?? "none"}
+            initial={{ scale: 1.4 }}
+            animate={{ scale: 1 }}
+            transition={{ type: "spring", stiffness: 420, damping: 14 }}
+            className="inline-block font-hand text-2xl leading-none text-(--salsa)"
+          >
+            {value === null ? "?" : value}/10
+          </motion.span>
+        </span>
       </div>
       <div
         ref={trackRef}

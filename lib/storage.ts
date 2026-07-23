@@ -107,6 +107,21 @@ export async function setMyRating(
     );
 }
 
+/** Remove this browser's rating for a place. */
+export async function clearMyRating(burritoId: string): Promise<void> {
+  if (!supabase) {
+    const ratings = read<Record<string, number>>(RATINGS_KEY, {});
+    delete ratings[burritoId];
+    write(RATINGS_KEY, ratings);
+    return;
+  }
+  await supabase
+    .from("ratings")
+    .delete()
+    .eq("burrito_id", burritoId)
+    .eq("client_id", clientId());
+}
+
 /* ----------------------------- comments ----------------------------- */
 
 export async function getComments(burritoId: string): Promise<UserComment[]> {
