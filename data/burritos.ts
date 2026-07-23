@@ -342,19 +342,6 @@ export const BURRITOS: Burrito[] = [
     "plays": 31800
   },
   {
-    "id": "berkeley",
-    "name": "Burrito",
-    "taqueria": "Berkeley",
-    "neighborhood": "",
-    "tier": "C",
-    "fluffieNotes": "raleigh's taco tuesday complements of a new videographer",
-    "lat": 36.70146,
-    "lng": -118.756,
-    "imgUrl": "/images/burritos/berkeley.jpg",
-    "videoUrl": "https://www.tiktok.com/@fluffie.donut/video/7501525751582215454",
-    "plays": 31700
-  },
-  {
     "id": "taqueria-pancho-villa",
     "name": "Burrito",
     "taqueria": "Taqueria Pancho Villa",

@@ -76,8 +76,7 @@
     "tier": "C"
   },
   "berkeley-7501525751582215454": {
-    "frame": "f2.jpg",
-    "tier": "C"
+    "skip": true
   },
   "taqueria-guadalajara-grill-7586747905260752159": {
     "frame": "f3.jpg",
