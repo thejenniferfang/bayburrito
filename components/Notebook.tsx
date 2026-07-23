@@ -47,7 +47,19 @@ export default function Notebook({ burrito }: { burrito: Burrito }) {
                   className="text-xl leading-tight text-(--paper-ink) md:text-3xl"
                   style={{ fontFamily: "var(--font-bitcount)" }}
                 >
-                  {burrito.taqueria}
+                  {burrito.videoUrl ? (
+                    <a
+                      href={burrito.videoUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                      title="watch the review"
+                      className="underline decoration-(--paper-ink)/25 underline-offset-4 transition-colors duration-150 hover:text-(--salsa)"
+                    >
+                      {burrito.taqueria}
+                    </a>
+                  ) : (
+                    burrito.taqueria
+                  )}
                 </h2>
                 <p className="font-hand text-lg text-(--paper-ink)/60 md:text-xl">
                   {burrito.neighborhood}
@@ -61,18 +73,6 @@ export default function Notebook({ burrito }: { burrito: Burrito }) {
             <p className="mt-1 font-hand text-xl leading-7 text-(--paper-ink)/85 md:text-2xl">
               &ldquo;{burrito.fluffieNotes}&rdquo;
             </p>
-            {burrito.videoUrl && (
-              <p className="font-hand text-base text-(--paper-ink)/55">
-                <a
-                  href={burrito.videoUrl}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="underline decoration-(--paper-ink)/30 underline-offset-2 transition-colors duration-150 hover:text-(--salsa)"
-                >
-                  watch the review
-                </a>
-              </p>
-            )}
           </div>
 
           {/* right: your rating + comments */}

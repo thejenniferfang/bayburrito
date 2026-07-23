@@ -43,7 +43,8 @@ export default function TierList() {
                     <button
                       key={b.id}
                       onClick={() => setOpen(b)}
-                      className="pressable flex flex-col items-start rounded-md bg-(--salsa) px-2.5 py-1.5 text-left leading-tight transition-opacity duration-200 hover:opacity-90"
+                      style={{ background: TIER_COLORS[tier] }}
+                      className="pressable flex flex-col items-start rounded-md px-2.5 py-1.5 text-left leading-tight transition-opacity duration-200 hover:opacity-90"
                     >
                       <span className="w-full truncate text-[13px] font-medium text-white">
                         {b.taqueria}

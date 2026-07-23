@@ -243,10 +243,10 @@ export default function BayMap({ active = true }: { active?: boolean }) {
       {!placing && !pending && (
         <button
           onClick={() => setPlacing(true)}
-          className="pressable absolute left-1/2 top-4 z-[1000] -translate-x-1/2 rounded-full bg-(--salsa) px-5 py-2.5 text-[12px] font-bold uppercase tracking-[0.12em] text-white shadow-[0_8px_24px_rgba(40,28,16,0.3)]"
-          style={{ fontFamily: "var(--font-mono)" }}
+          className="pressable absolute left-1/2 top-4 z-[1000] -translate-x-1/2 rounded-full bg-(--olive) px-5 py-2 text-xl text-white shadow-[0_8px_24px_rgba(40,28,16,0.3)]"
+          style={{ fontFamily: "var(--font-hand)" }}
         >
-          + Request a spot for fluffie
+          + request a spot for fluffie
         </button>
       )}
 

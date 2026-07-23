@@ -22,7 +22,7 @@ export default function SegmentedControl({
     <div
       role="tablist"
       aria-label="View"
-      className="flex rounded-full border border-(--ink)/15 bg-(--surface) p-1"
+      className="flex rounded-full bg-(--surface) p-1"
     >
       {OPTIONS.map((opt) => {
         const active = value === opt.key;

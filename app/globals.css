@@ -23,6 +23,7 @@
   /* funky food accents (Mala Project) */
   --salsa: #d13a24;
   --verde: #2f7d3a;
+  --olive: #6e8c3e;
   --marigold: #e2a01f;
   --grape: #6d4fb3;
   --hotpink: #e0356b;
@@ -31,8 +32,8 @@
   --tier-s: #d13a24;
   --tier-a: #e0821e;
   --tier-b: #cfa42a;
-  --tier-c: #5f8a3f;
-  --tier-d: #5f7f8a;
+  --tier-c: #6e8c3e;
+  --tier-d: #7b92aa;
   --tier-f: #8f8271;
 
   --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
