@@ -133,5 +133,21 @@
   "Tacos Los Gemelos, Redwood City, California": {
     "lat": 37.47929,
     "lng": -122.22608
+  },
+  "3700 Florence St, Redwood City, CA 94063, USA": {
+    "lat": 37.47859,
+    "lng": -122.18761
+  },
+  "California, United States": {
+    "lat": 36.70146,
+    "lng": -118.756
+  },
+  "417 Mace Blvd A, Davis, CA 95618, USA": {
+    "lat": 38.55012,
+    "lng": -121.69588
+  },
+  "2438 Telegraph Ave, Berkeley, CA 94704, USA": {
+    "lat": 37.86627,
+    "lng": -122.25886
   }
 }
