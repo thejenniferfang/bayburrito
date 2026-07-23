@@ -255,22 +255,22 @@ function SusanItem({
   // t = 0 puts this burrito at the table's apex (12 o'clock, front-center)
   const theta = (r: number) => ((r + index * step) * Math.PI) / 180;
   const transform = useTransform(rotation, (r) => {
-    const t = theta(r);
+    // wrap the angle to [-π, π] so everything below is symmetric on both
+    // sides of the apex and stays correct after full spins. Using the raw
+    // angle made the gaussian favor one side.
+    const tw = Math.atan2(Math.sin(theta(r)), Math.cos(theta(r)));
     // sharp gaussian bump so the apex plate clearly leads even with
     // 30+ items packed 11 degrees apart
-    const bump = Math.exp(-((t / 0.35) ** 2));
+    const bump = Math.exp(-((tw / 0.35) ** 2));
     const lift = R + 30 * bump; // apex eases outward off the rim
-    const x = Math.sin(t) * lift;
-    const y = -Math.cos(t) * lift;
+    const x = Math.sin(tw) * lift;
+    const y = -Math.cos(tw) * lift;
     const scale = 0.64 + 0.58 * bump;
-    // plates rotate WITH the table, like objects on a real lazy Susan,
-    // except near the apex where the hero straightens up to face you.
-    // normalize to [-180, 180) so damping doesn't jump after full spins
-    // (the seam at 180 sits at the table's hidden back edge)
-    const raw = r + index * step;
-    const spin = ((((raw + 180) % 360) + 360) % 360) - 180;
+    // plates rotate WITH the table (like a real lazy Susan), except near the
+    // apex where the hero straightens up to face you. tw is already in
+    // [-180, 180] once converted to degrees.
+    const spin = (tw * 180) / Math.PI;
     return `translate(-50%, -50%) translate(${x}px, ${y}px) rotate(${spin * (1 - bump)}deg) scale(${scale})`;
-    return `translate(-50%, -50%) translate(${x}px, ${y}px) rotate(${spin}deg) scale(${scale})`;
   });
   const filter = useTransform(rotation, (r) => {
     const c = Math.cos(theta(r));
