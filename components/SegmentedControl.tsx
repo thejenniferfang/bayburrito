@@ -32,7 +32,8 @@ export default function SegmentedControl({
             role="tab"
             aria-selected={active}
             onClick={() => onChange(opt.key)}
-            className={`pressable relative rounded-full px-4 py-0.5 font-hand text-xl leading-none transition-colors duration-200 md:px-5 ${
+            style={{ fontFamily: "var(--font-bitcount)" }}
+            className={`pressable relative rounded-full px-4 py-1 text-sm leading-none transition-colors duration-200 md:px-5 ${
               active ? "text-(--bg)" : "text-(--ink-dim) hover:text-(--ink)"
             }`}
           >

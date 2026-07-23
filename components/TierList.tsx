@@ -107,7 +107,19 @@ function DetailModal({
               {burrito.tier}
             </span>
             <h3 className="mt-1 font-hand text-3xl leading-tight text-(--ink)">
-              {burrito.taqueria}
+              {burrito.videoUrl ? (
+                <a
+                  href={burrito.videoUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  title="watch the review"
+                  className="transition-colors duration-150 hover:text-(--salsa)"
+                >
+                  {burrito.taqueria}
+                </a>
+              ) : (
+                burrito.taqueria
+              )}
             </h3>
             <p className="font-hand text-xl text-(--ink-dim)">
               {burrito.neighborhood}
@@ -118,21 +130,11 @@ function DetailModal({
         <p className="mt-4 font-hand text-2xl leading-8 text-(--ink)/85">
           &ldquo;{burrito.fluffieNotes}&rdquo;
         </p>
-        <p className="mt-3 font-hand text-xl text-(--salsa)">
-          {burrito.beliRating !== undefined && (
-            <>beli {burrito.beliRating.toFixed(1)} / 10 &middot; </>
-          )}
-          {burrito.videoUrl && (
-            <a
-              href={burrito.videoUrl}
-              target="_blank"
-              rel="noreferrer"
-              className="underline underline-offset-2 transition-colors duration-150 hover:text-(--ink)"
-            >
-              watch on tiktok
-            </a>
-          )}
-        </p>
+        {burrito.beliRating !== undefined && (
+          <p className="mt-3 font-hand text-xl text-(--salsa)">
+            beli {burrito.beliRating.toFixed(1)} / 10
+          </p>
+        )}
         <button
           onClick={onClose}
           className="pressable mt-5 w-full rounded-md border border-(--line) py-2 font-hand text-xl text-(--ink-dim) transition-colors duration-150 hover:text-(--ink)"
