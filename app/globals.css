@@ -138,10 +138,22 @@ textarea {
   background: rgba(244, 236, 218, 0.7) !important;
   font-size: 9px !important;
 }
-.leaflet-bar a {
+/* zoom control: two independent circles, no border */
+.leaflet-control-zoom.leaflet-bar {
+  border: none !important;
+  box-shadow: none !important;
+  background: transparent !important;
+}
+.leaflet-control-zoom a {
+  width: 34px !important;
+  height: 34px !important;
+  line-height: 34px !important;
+  margin-bottom: 6px !important;
+  border: none !important;
+  border-radius: 50% !important;
   background: var(--surface) !important;
   color: var(--ink) !important;
-  border-color: var(--line) !important;
+  box-shadow: 0 2px 8px rgba(40, 28, 16, 0.22) !important;
 }
 
 @media (prefers-reduced-motion: reduce) {
