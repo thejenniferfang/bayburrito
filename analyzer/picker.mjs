@@ -127,5 +127,8 @@ function exportPicks() {
 render();
 </script>`;
 
+// same interactive picker at both names: contact-sheet.html is the one
+// Jen reaches for, picker.html kept as an alias
 writeFileSync(join(root, "../assets/picker.html"), html);
-console.log(`wrote assets/picker.html (${places.length} places)`);
+writeFileSync(join(root, "../assets/contact-sheet.html"), html);
+console.log(`wrote assets/picker.html + contact-sheet.html (${places.length} places)`);

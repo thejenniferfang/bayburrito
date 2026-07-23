@@ -42,3 +42,4 @@ next-env.d.ts
 
 # scraped video files (re-downloadable, large)
 assets/video/
+.gstack/
