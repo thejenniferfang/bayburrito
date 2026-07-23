@@ -170,10 +170,7 @@ export default function LazySusan({
     <div
       ref={containerRef}
       className="relative h-full w-full cursor-grab touch-none select-none overflow-hidden active:cursor-grabbing"
-      style={{
-        background:
-          "radial-gradient(120% 90% at 50% 120%, #3a2c1f 0%, var(--room) 45%, var(--room-edge) 100%)",
-      }}
+      style={{ background: "#9BB7D4" }}
       onPointerDown={onPointerDown}
       onPointerMove={onPointerMove}
       onPointerUp={onPointerUp}
@@ -231,7 +228,6 @@ function TableDisc({
         width: Rt * 2,
         height: Rt * 2,
         transform,
-        filter: "drop-shadow(0 -14px 40px rgba(0,0,0,0.5))",
       }}
     />
   );
@@ -287,9 +283,6 @@ function SusanItem({
   const zIndex = useTransform(rotation, (r) =>
     Math.round(Math.cos(theta(r)) * 50 + 50)
   );
-  const shadowOpacity = useTransform(rotation, (r) =>
-    Math.max(Math.cos(theta(r)), 0) * 0.8
-  );
 
   return (
     <motion.div
@@ -301,10 +294,6 @@ function SusanItem({
       className="absolute left-1/2"
       style={{ top: cy, width: itemW, transform, filter, opacity, zIndex }}
     >
-      <motion.div
-        className="absolute left-1/2 top-[8%] h-[92%] w-[92%] -translate-x-1/2 rounded-full bg-black/50 blur-[8px]"
-        style={{ opacity: shadowOpacity }}
-      />
       <BurritoImage
         src={burrito.imgUrl}
         alt={burrito.taqueria}

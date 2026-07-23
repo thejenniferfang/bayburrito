@@ -24,10 +24,10 @@ function timeAgo(at: number) {
 /** The top-half notebook page for the active burrito. */
 export default function Notebook({ burrito }: { burrito: Burrito }) {
   return (
-    <div className="paper relative h-full overflow-hidden shadow-[inset_0_-14px_24px_rgba(43,36,26,0.12)]">
-      {/* red margin line */}
-      <div className="absolute inset-y-0 left-10 w-px bg-(--paper-red)/50 md:left-16" />
-
+    <div
+      className="relative h-full overflow-hidden"
+      style={{ background: "#9BB7D4" }}
+    >
       {/* concurrent crossfade (no mode="wait"): the wheel sweeps through
           several burritos per spin and interrupted waits never resolve */}
       <AnimatePresence initial={false}>
@@ -37,30 +37,29 @@ export default function Notebook({ burrito }: { burrito: Burrito }) {
           animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
           exit={{ opacity: 0, y: -8, filter: "blur(3px)" }}
           transition={{ duration: 0.14, ease: [0.23, 1, 0.32, 1] }}
-          className="absolute inset-0 flex flex-col gap-1 overflow-y-auto py-4 pl-14 pr-5 md:py-6 md:pl-24 md:pr-10"
+          className="absolute inset-0 flex gap-6 overflow-hidden px-6 py-3 md:gap-10 md:px-12 md:py-4"
         >
-          <div className="flex items-start justify-between gap-4">
-            <div>
-              <h2 className="font-hand text-3xl leading-tight text-(--paper-ink) md:text-5xl">
-                {burrito.taqueria}
-              </h2>
-              <p className="font-hand text-xl text-(--paper-ink)/60 md:text-2xl">
-                {burrito.neighborhood} &middot; {burrito.name}
-              </p>
+          {/* left: place identity + notes */}
+          <div className="flex min-w-0 flex-1 flex-col gap-0.5">
+            <div className="flex items-start justify-between gap-3">
+              <div className="min-w-0">
+                <h2 className="font-hand text-2xl leading-tight text-(--paper-ink) md:text-4xl">
+                  {burrito.taqueria}
+                </h2>
+                <p className="font-hand text-lg text-(--paper-ink)/60 md:text-xl">
+                  {burrito.neighborhood}
+                </p>
+              </div>
+              {burrito.beliRating !== undefined && (
+                <BeliStamp score={burrito.beliRating} />
+              )}
             </div>
-            {burrito.beliRating !== undefined && (
-              <BeliStamp score={burrito.beliRating} />
-            )}
-          </div>
 
-          <p className="mt-2 max-w-xl font-hand text-2xl leading-8 text-(--paper-ink)/85 md:text-[1.7rem]">
-            &ldquo;{burrito.fluffieNotes}&rdquo;
-          </p>
-          <p className="font-hand text-lg text-(--paper-ink)/45">
-            @fluffie.donut
+            <p className="mt-1 font-hand text-xl leading-7 text-(--paper-ink)/85 md:text-2xl">
+              &ldquo;{burrito.fluffieNotes}&rdquo;
+            </p>
             {burrito.videoUrl && (
-              <>
-                {" "}&middot;{" "}
+              <p className="font-hand text-base text-(--paper-ink)/55">
                 <a
                   href={burrito.videoUrl}
                   target="_blank"
@@ -69,11 +68,12 @@ export default function Notebook({ burrito }: { burrito: Burrito }) {
                 >
                   watch the review
                 </a>
-              </>
+              </p>
             )}
-          </p>
+          </div>
 
-          <div className="mt-auto flex flex-col gap-3 pt-3 md:flex-row md:items-end md:gap-10">
+          {/* right: your rating + comments */}
+          <div className="flex w-[240px] shrink-0 flex-col justify-center gap-2 md:w-[300px]">
             <RatingBar burritoId={burrito.id} />
             <Comments burritoId={burrito.id} />
           </div>
@@ -126,8 +126,8 @@ function RatingBar({ burritoId }: { burritoId: string }) {
   return (
     <div className="w-full md:max-w-60">
       <div className="mb-1 flex items-baseline justify-between">
-        <span className="text-[10px] font-medium uppercase tracking-[0.25em] text-(--paper-ink)/50">
-          Your rating
+        <span className="font-hand text-xl text-(--paper-ink)/70">
+          your rating
         </span>
         <span className="font-hand text-2xl leading-none text-(--salsa)">
           {value === null ? "?" : value}/10
@@ -141,7 +141,7 @@ function RatingBar({ burritoId }: { burritoId: string }) {
         aria-valuemax={10}
         aria-valuenow={value ?? 0}
         tabIndex={0}
-        className="relative h-4 cursor-pointer touch-none overflow-hidden rounded-sm border border-(--paper-ink)/25 bg-(--paper-shade)"
+        className="relative h-4 cursor-pointer touch-none overflow-hidden rounded-sm border border-(--paper-ink)/25 bg-black/10"
         onPointerDown={(e) => {
           dragging.current = true;
           (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
@@ -218,9 +218,9 @@ function Comments({ burritoId }: { burritoId: string }) {
         />
         <button
           onClick={post}
-          className="pressable pb-1 text-[10px] font-medium uppercase tracking-[0.25em] text-(--paper-ink)/50 transition-colors duration-150 hover:text-(--salsa)"
+          className="pressable pb-1 font-hand text-lg text-(--paper-ink)/60 transition-colors duration-150 hover:text-(--salsa)"
         >
-          Post
+          post
         </button>
       </div>
     </div>

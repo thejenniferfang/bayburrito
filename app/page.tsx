@@ -45,26 +45,21 @@ export default function Home() {
         }}
         transition={{ duration: 0.5, ease: [0.23, 1, 0.32, 1] }}
       >
-        <header className="flex items-center justify-between gap-3 border-b border-(--line) bg-(--bg) px-4 py-3 md:px-8">
-          <div className="flex min-w-0 items-center gap-3">
-            <h1
-              className="truncate text-base font-bold uppercase leading-none tracking-[0.02em] text-(--ink) md:text-xl"
-              style={{ fontFamily: "var(--font-display)" }}
-            >
-              Bay Burrito<span className="text-(--salsa)">.</span>Challenge
-            </h1>
-            <span className="hidden shrink-0 font-hand text-xl text-(--salsa) sm:block">
-              eaten by hand
-            </span>
+        <header className="grid grid-cols-[1fr_auto_1fr] items-center gap-3 border-b border-(--line) bg-(--bg) px-4 py-3 md:px-8">
+          <h1 className="truncate font-hand text-2xl leading-none text-(--ink) md:text-3xl">
+            Bay Burrito Challenge
+          </h1>
+          <div className="justify-self-center">
+            <SegmentedControl value={view} onChange={setView} />
           </div>
-          <SegmentedControl value={view} onChange={setView} />
+          <div />
         </header>
 
         {/* all three views stay mounted in absolute layers: zero layout shift */}
         <div className="relative min-h-0 flex-1">
           <ViewLayer active={view === "susan"}>
             <div className="flex h-full flex-col">
-              <div className="h-[42%] min-h-0 md:h-1/2">
+              <div className="h-[30%] min-h-0">
                 <Notebook burrito={active} />
               </div>
               <div className="min-h-0 flex-1">

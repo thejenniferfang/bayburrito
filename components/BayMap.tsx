@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import type { Map as LMap, Marker } from "leaflet";
 import "leaflet/dist/leaflet.css";
-import { BURRITOS, TIER_COLORS } from "@/data/burritos";
+import { BURRITOS, TIERS, TIER_COLORS } from "@/data/burritos";
 import { addRequest, getRequests, type SpotRequest } from "@/lib/storage";
 
 const esc = (s: string) =>
@@ -317,17 +317,25 @@ export default function BayMap({ active = true }: { active?: boolean }) {
         </div>
       )}
 
-      {/* legend */}
+      {/* tier color key */}
       <div
-        className="absolute bottom-6 left-4 z-[900] flex flex-col gap-1 rounded-md border border-(--line) bg-(--surface)/90 px-3 py-2 text-[10px] uppercase tracking-[0.1em] text-(--ink-dim)"
-        style={{ fontFamily: "var(--font-mono)" }}
+        className="absolute bottom-6 left-4 z-[900] rounded-lg border border-(--line) bg-(--surface)/95 px-3.5 py-2.5"
+        style={{ fontFamily: "var(--font-hand)" }}
       >
-        <span className="flex items-center gap-2">
-          <span className="inline-block h-2.5 w-2.5 rounded-full bg-(--salsa)" />
-          reviewed by fluffie
-        </span>
-        <span className="flex items-center gap-2">
-          <span className="inline-block h-2.5 w-2.5 rounded-full bg-(--hotpink)" />
+        <p className="mb-1 text-lg leading-none text-(--ink)/70">tiers</p>
+        <div className="flex items-center gap-2.5">
+          {TIERS.map((t) => (
+            <span key={t} className="flex items-center gap-1">
+              <span
+                className="inline-block h-3 w-3 rounded-full"
+                style={{ background: TIER_COLORS[t] }}
+              />
+              <span className="text-lg leading-none text-(--ink)">{t}</span>
+            </span>
+          ))}
+        </div>
+        <span className="mt-1.5 flex items-center gap-1.5 text-lg leading-none text-(--ink-dim)">
+          <span className="inline-block h-3 w-3 rounded-full bg-(--hotpink)" />
           requested {requests.length > 0 ? `(${requests.length})` : ""}
         </span>
       </div>

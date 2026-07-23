@@ -17,50 +17,38 @@ export default function TierList() {
   }, [open]);
 
   return (
-    <div className="h-full overflow-y-auto px-5 py-6 md:px-12">
-      <div className="mx-auto max-w-4xl">
+    <div className="h-full overflow-y-auto px-4 py-3 md:px-10">
+      <div className="mx-auto max-w-5xl">
         {TIERS.map((tier) => {
           const entries = BURRITOS.filter((b) => b.tier === tier);
           return (
             <section
               key={tier}
-              className="grid grid-cols-[3.5rem_1fr] gap-4 border-t border-(--line) py-5 md:grid-cols-[6rem_1fr] md:gap-8"
+              className="grid grid-cols-[2.5rem_1fr] items-center gap-3 border-t border-(--line) py-2 md:grid-cols-[3.5rem_1fr] md:gap-5"
             >
-              <div className="flex flex-col items-start">
-                <span
-                  className="text-5xl font-bold leading-none md:text-7xl"
-                  style={{ color: TIER_COLORS[tier], fontFamily: "var(--font-display)" }}
-                >
-                  {tier}
-                </span>
-                <span className="mt-1 text-[10px] uppercase tracking-[0.25em] text-(--ink-dim)">
-                  {entries.length || "no"}{" "}
-                  {entries.length === 1 ? "entry" : "entries"}
-                </span>
-              </div>
+              <span
+                className="text-4xl font-bold leading-none md:text-5xl"
+                style={{ color: TIER_COLORS[tier], fontFamily: "var(--font-display)" }}
+              >
+                {tier}
+              </span>
 
               {entries.length === 0 ? (
-                <p className="self-center font-hand text-xl text-(--ink-dim)/60">
+                <p className="font-hand text-lg text-(--ink-dim)/60">
                   nothing here yet...
                 </p>
               ) : (
-                <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
-                  {entries.map((b, i) => (
+                <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-4">
+                  {entries.map((b) => (
                     <button
                       key={b.id}
                       onClick={() => setOpen(b)}
-                      className="pressable group flex flex-col items-start rounded-md border border-(--line) bg-(--surface) p-3 text-left transition-colors duration-200 hover:border-(--salsa)"
+                      className="pressable flex flex-col items-start rounded-md border border-(--line) bg-(--surface) px-2.5 py-1.5 text-left leading-tight transition-colors duration-200 hover:border-(--salsa)"
                     >
-                      <BurritoImage
-                        src={b.imgUrl}
-                        alt={b.taqueria}
-                        variant={i}
-                        className="mb-2 w-20 opacity-90 transition-opacity duration-200 group-hover:opacity-100"
-                      />
-                      <span className="text-sm text-(--ink)">
+                      <span className="w-full truncate text-[13px] font-medium text-(--ink)">
                         {b.taqueria}
                       </span>
-                      <span className="text-xs text-(--ink-dim)">
+                      <span className="w-full truncate text-[11px] text-(--ink-dim)">
                         {b.neighborhood}
                       </span>
                     </button>
@@ -109,22 +97,19 @@ function DetailModal({
         transition={{ duration: 0.2, ease: [0.23, 1, 0.32, 1] }}
         className="relative w-full max-w-md rounded-lg border border-(--line) bg-(--surface) p-6 shadow-[0_30px_80px_rgba(40,28,16,0.35)]"
       >
-        <div className="flex items-start justify-between">
-          <div>
+        <div className="flex items-start justify-between gap-4">
+          <div className="min-w-0">
             <span
-              className="text-4xl font-bold"
-              style={{ color: TIER_COLORS[burrito.tier], fontFamily: "var(--font-display)" }}
+              className="font-hand text-5xl leading-none"
+              style={{ color: TIER_COLORS[burrito.tier] }}
             >
               {burrito.tier}
             </span>
-            <h3
-              className="mt-1 text-2xl font-bold text-(--ink)"
-              style={{ fontFamily: "var(--font-display)" }}
-            >
+            <h3 className="mt-1 font-hand text-3xl leading-tight text-(--ink)">
               {burrito.taqueria}
             </h3>
-            <p className="text-sm text-(--ink-dim)">
-              {burrito.name} &middot; {burrito.neighborhood}
+            <p className="font-hand text-xl text-(--ink-dim)">
+              {burrito.neighborhood}
             </p>
           </div>
           <BurritoImage src={burrito.imgUrl} alt={burrito.taqueria} className="w-24 shrink-0" />
@@ -132,9 +117,9 @@ function DetailModal({
         <p className="mt-4 font-hand text-2xl leading-8 text-(--ink)/85">
           &ldquo;{burrito.fluffieNotes}&rdquo;
         </p>
-        <p className="mt-3 text-[11px] uppercase tracking-[0.2em] text-(--salsa)">
+        <p className="mt-3 font-hand text-xl text-(--salsa)">
           {burrito.beliRating !== undefined && (
-            <>Beli {burrito.beliRating.toFixed(1)} / 10 &middot; </>
+            <>beli {burrito.beliRating.toFixed(1)} / 10 &middot; </>
           )}
           {burrito.videoUrl && (
             <a
@@ -143,15 +128,15 @@ function DetailModal({
               rel="noreferrer"
               className="underline underline-offset-2 transition-colors duration-150 hover:text-(--ink)"
             >
-              Watch on TikTok
+              watch on tiktok
             </a>
           )}
         </p>
         <button
           onClick={onClose}
-          className="pressable mt-5 w-full rounded-sm border border-(--line) py-2 text-[11px] uppercase tracking-[0.25em] text-(--ink-dim) transition-colors duration-150 hover:text-(--ink)"
+          className="pressable mt-5 w-full rounded-md border border-(--line) py-2 font-hand text-xl text-(--ink-dim) transition-colors duration-150 hover:text-(--ink)"
         >
-          Close
+          close
         </button>
       </motion.div>
     </motion.div>
