@@ -264,7 +264,7 @@ function Comments({ burritoId }: { burritoId: string }) {
           onKeyDown={(e) => e.key === "Enter" && post()}
           placeholder="leave a note..."
           aria-label="Leave a comment"
-          className="w-full bg-transparent py-1 font-hand text-xl text-(--paper-ink) placeholder:text-(--paper-ink)/35 focus:outline-none"
+          className="paper-input w-full bg-transparent py-1 font-hand text-xl text-(--paper-ink) placeholder:text-(--paper-ink)/35 focus:outline-none"
         />
         <button
           onClick={post}
