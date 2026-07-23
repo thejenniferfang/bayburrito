@@ -1,0 +1,124 @@
+@import "tailwindcss";
+
+:root {
+  /* palette: warm dark editorial */
+  --bg: #131110;
+  --bg-raised: #1b1815;
+  --ink: #ede5d8;
+  --ink-dim: #9b917f;
+  --line: #2a251f;
+
+  /* notebook paper */
+  --paper: #f3ebdc;
+  --paper-shade: #e6dbc6;
+  --paper-line: #d8ccb6;
+  --paper-ink: #2b241a;
+  --paper-red: #b3543f;
+
+  --accent: #c0803a;
+  --salsa: #c23b26;
+
+  /* tiers: S rich umber/ochre down to F slate */
+  --tier-s: #c0803a;
+  --tier-a: #9c6b35;
+  --tier-b: #7a6a4f;
+  --tier-c: #66665e;
+  --tier-d: #565960;
+  --tier-f: #454a52;
+
+  /* strong custom easings */
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-bg-raised: var(--bg-raised);
+  --color-ink: var(--ink);
+  --color-ink-dim: var(--ink-dim);
+  --color-line: var(--line);
+  --color-paper: var(--paper);
+  --color-paper-ink: var(--paper-ink);
+  --color-accent: var(--accent);
+  --color-salsa: var(--salsa);
+  --font-serif: var(--font-instrument), Georgia, serif;
+  --font-sans: var(--font-geist-sans), system-ui, sans-serif;
+  --font-hand: var(--font-hand), cursive;
+}
+
+html,
+body {
+  height: 100%;
+  overflow: hidden;
+  overscroll-behavior: none;
+}
+
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-geist-sans), system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+::selection {
+  background: var(--accent);
+  color: var(--bg);
+}
+
+/* film grain over everything */
+.grain::after {
+  content: "";
+  position: fixed;
+  inset: -50%;
+  width: 200%;
+  height: 200%;
+  pointer-events: none;
+  z-index: 100;
+  opacity: 0.05;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* notebook ruled paper */
+.paper {
+  background-color: var(--paper);
+  background-image:
+    repeating-linear-gradient(
+      to bottom,
+      transparent 0,
+      transparent 31px,
+      var(--paper-line) 31px,
+      var(--paper-line) 32px
+    );
+  color: var(--paper-ink);
+}
+
+/* every pressable thing answers back */
+.pressable {
+  transition: transform 140ms var(--ease-out);
+}
+.pressable:active {
+  transform: scale(0.97);
+}
+
+button {
+  cursor: pointer;
+}
+
+input,
+button {
+  font: inherit;
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}

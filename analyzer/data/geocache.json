@@ -1,0 +1,137 @@
+{
+  "920 Heinz Ave, Berkeley, CA 94710, USA": {
+    "lat": 37.8534,
+    "lng": -122.29036
+  },
+  "3275 22nd St, San Francisco, CA 94110, USA": {
+    "lat": 37.75522,
+    "lng": -122.42036
+  },
+  "2327 McKee Rd, San Jose, CA 95116, USA": {
+    "lat": 37.36555,
+    "lng": -121.84935
+  },
+  "2341 Folsom St, San Francisco, CA 94110, USA": {
+    "lat": 37.75985,
+    "lng": -122.41455
+  },
+  "2777 Mission St, San Francisco, CA 94110, United States": {
+    "lat": 37.75267,
+    "lng": -122.41824
+  },
+  "1243 Middlefield Rd, Redwood City, California 94063-2012, USA": {
+    "lat": 37.48387,
+    "lng": -122.22514
+  },
+  "795 5th Ave, Redwood City, United States": {
+    "lat": 37.47981,
+    "lng": -122.19998
+  },
+  "2989 College Ave, Berkeley, CA 94705, USA": {
+    "lat": 37.85734,
+    "lng": -122.25302
+  },
+  "475 Sacramento St, San Francisco, CA 94111, USA": {
+    "lat": 37.79398,
+    "lng": -122.40063
+  },
+  "1933 Menalto Ave, Menlo Park, CA 94025, USA": {
+    "lat": 37.45942,
+    "lng": -122.1527
+  },
+  "2889 Mission St, San Francisco, CA 94110, United States": {
+    "lat": 37.75089,
+    "lng": -122.41807
+  },
+  "1916 Martin Luther King Jr Way, Berkeley, CA 94704, USA": {
+    "lat": 37.87288,
+    "lng": -122.27333
+  },
+  "2105 Old Middlefield Way, Mountain View, CA 94043, USA": {
+    "lat": 37.41408,
+    "lng": -122.09318
+  },
+  "2907 El Camino Real, Redwood City, CA 94061, USA": {
+    "lat": 37.46924,
+    "lng": -122.21127
+  },
+  "3726 Florence St, Redwood City, CA 94063, USA": {
+    "lat": 37.47848,
+    "lng": -122.18692
+  },
+  "243 3rd St, San Rafael, CA 94901, USA": {
+    "lat": 37.96939,
+    "lng": -122.51577
+  },
+  "175 W 25th Ave, San Mateo, CA, United States": {
+    "lat": 37.54332,
+    "lng": -122.30857
+  },
+  "491 Lytton Ave, Palo Alto, CA 94301, USA": {
+    "lat": 37.44896,
+    "lng": -122.16085
+  },
+  "447 E William St, San Jose, CA 95112, USA": {
+    "lat": 37.33315,
+    "lng": -121.87587
+  },
+  "492 S Bascom Ave, San Jose, CA 95128, USA": {
+    "lat": 37.30248,
+    "lng": -121.9318
+  },
+  "2426 Hauser Blvd, Los Angeles, CA 90019, USA": {
+    "lat": 34.03482,
+    "lng": -118.36175
+  },
+  "3360 Middlefield Rd, Menlo Park, CA 94025, USA": {
+    "lat": 37.4571,
+    "lng": -122.16906
+  },
+  "1500 S Van Ness Ave #100, San Francisco, CA 94110, United States": null,
+  "1630 El Camino Real #2108, Redwood City, CA 94063, USA": null,
+  "2384 Telegraph Ave, Berkeley, CA 94704, USA": {
+    "lat": 37.86716,
+    "lng": -122.25898
+  },
+  "2215 Mission St, Santa Cruz, CA 95060, USA": {
+    "lat": 36.96154,
+    "lng": -122.04579
+  },
+  "394 Grand Ave, South San Francisco, CA 94080, USA": {
+    "lat": 37.65578,
+    "lng": -122.41221
+  },
+  "3636 El Camino Real, Palo Alto, CA 94306, USA": {
+    "lat": 37.41817,
+    "lng": -122.13321
+  },
+  "4610 International Blvd, Oakland, CA 94601, United States": {
+    "lat": 37.77085,
+    "lng": -122.21121
+  },
+  "4798 Mission St, San Francisco, CA 94112, USA": {
+    "lat": 37.72147,
+    "lng": -122.43754
+  },
+  "2390 Clarke Ave, East Palo Alto, CA 94303, USA": {
+    "lat": 37.47134,
+    "lng": -122.13482
+  },
+  "139 Water St, Santa Cruz, CA 95060, USA": {
+    "lat": 36.97708,
+    "lng": -122.02671
+  },
+  "36 Rancho Del Mar, Aptos, CA 95003, EE. UU.": null,
+  "365 S B St, San Mateo, CA 94401, USA": {
+    "lat": 37.56505,
+    "lng": -122.3216
+  },
+  "Tacos El Patron, San Francisco, California": {
+    "lat": 37.74906,
+    "lng": -122.41615
+  },
+  "Tacos Los Gemelos, Redwood City, California": {
+    "lat": 37.47929,
+    "lng": -122.22608
+  }
+}

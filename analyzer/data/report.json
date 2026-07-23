@@ -1,0 +1,620 @@
+{
+  "scrapedVideos": 273,
+  "totalCatalog": 276,
+  "coverage": "98.9%",
+  "byCategory": [
+    {
+      "category": "Restaurant",
+      "videos": 8,
+      "totalPlays": 338401,
+      "medianPlays": 44200,
+      "avgEngagement": "6.1%",
+      "avgSaveRate": "0.6%"
+    },
+    {
+      "category": "Shopping Area",
+      "videos": 1,
+      "totalPlays": 35800,
+      "medianPlays": 35800,
+      "avgEngagement": "8.7%",
+      "avgSaveRate": "1.0%"
+    },
+    {
+      "category": "Food and Beverage Retail",
+      "videos": 7,
+      "totalPlays": 246487,
+      "medianPlays": 29600,
+      "avgEngagement": "6.3%",
+      "avgSaveRate": "0.4%"
+    },
+    {
+      "category": "Indian Cuisine",
+      "videos": 3,
+      "totalPlays": 116200,
+      "medianPlays": 24600,
+      "avgEngagement": "7.0%",
+      "avgSaveRate": "0.9%"
+    },
+    {
+      "category": "Vietnamese Cuisine",
+      "videos": 4,
+      "totalPlays": 54611,
+      "medianPlays": 24300,
+      "avgEngagement": "4.5%",
+      "avgSaveRate": "0.6%"
+    },
+    {
+      "category": "Mexican Cuisine",
+      "videos": 35,
+      "totalPlays": 1299381,
+      "medianPlays": 19500,
+      "avgEngagement": "6.9%",
+      "avgSaveRate": "0.6%"
+    },
+    {
+      "category": "Entertainment",
+      "videos": 2,
+      "totalPlays": 30900,
+      "medianPlays": 17900,
+      "avgEngagement": "4.5%",
+      "avgSaveRate": "0.2%"
+    },
+    {
+      "category": "Bakery Shop",
+      "videos": 23,
+      "totalPlays": 591198,
+      "medianPlays": 17800,
+      "avgEngagement": "6.3%",
+      "avgSaveRate": "0.7%"
+    },
+    {
+      "category": "Italian Cuisine",
+      "videos": 5,
+      "totalPlays": 151385,
+      "medianPlays": 17400,
+      "avgEngagement": "6.1%",
+      "avgSaveRate": "0.8%"
+    },
+    {
+      "category": "Fast Food",
+      "videos": 17,
+      "totalPlays": 953302,
+      "medianPlays": 16500,
+      "avgEngagement": "6.4%",
+      "avgSaveRate": "0.5%"
+    },
+    {
+      "category": "Dessert Shop",
+      "videos": 29,
+      "totalPlays": 1580136,
+      "medianPlays": 16200,
+      "avgEngagement": "7.0%",
+      "avgSaveRate": "0.4%"
+    },
+    {
+      "category": "Deli Restaurant",
+      "videos": 8,
+      "totalPlays": 396040,
+      "medianPlays": 16100,
+      "avgEngagement": "6.8%",
+      "avgSaveRate": "0.8%"
+    },
+    {
+      "category": "Specialty Dining",
+      "videos": 21,
+      "totalPlays": 576886,
+      "medianPlays": 13000,
+      "avgEngagement": "5.6%",
+      "avgSaveRate": "0.4%"
+    },
+    {
+      "category": "Western Cuisine",
+      "videos": 5,
+      "totalPlays": 177990,
+      "medianPlays": 13000,
+      "avgEngagement": "6.0%",
+      "avgSaveRate": "0.5%"
+    },
+    {
+      "category": "Drinks",
+      "videos": 31,
+      "totalPlays": 923419,
+      "medianPlays": 12400,
+      "avgEngagement": "5.4%",
+      "avgSaveRate": "0.4%"
+    },
+    {
+      "category": "College and University",
+      "videos": 3,
+      "totalPlays": 65100,
+      "medianPlays": 11900,
+      "avgEngagement": "3.4%",
+      "avgSaveRate": "0.1%"
+    },
+    {
+      "category": "Nature-Based Attraction",
+      "videos": 1,
+      "totalPlays": 11900,
+      "medianPlays": 11900,
+      "avgEngagement": "5.3%",
+      "avgSaveRate": "0.2%"
+    },
+    {
+      "category": "Other Cuisine",
+      "videos": 7,
+      "totalPlays": 159331,
+      "medianPlays": 11200,
+      "avgEngagement": "4.9%",
+      "avgSaveRate": "0.5%"
+    },
+    {
+      "category": "Seafood Restaurant",
+      "videos": 1,
+      "totalPlays": 10700,
+      "medianPlays": 10700,
+      "avgEngagement": "5.9%",
+      "avgSaveRate": "0.3%"
+    },
+    {
+      "category": "Financial Service",
+      "videos": 1,
+      "totalPlays": 10500,
+      "medianPlays": 10500,
+      "avgEngagement": "7.4%",
+      "avgSaveRate": "0.4%"
+    },
+    {
+      "category": "Chinese Cuisine",
+      "videos": 12,
+      "totalPlays": 801703,
+      "medianPlays": 10300,
+      "avgEngagement": "6.3%",
+      "avgSaveRate": "0.9%"
+    },
+    {
+      "category": "Japanese Cuisine",
+      "videos": 11,
+      "totalPlays": 700245,
+      "medianPlays": 9410,
+      "avgEngagement": "5.5%",
+      "avgSaveRate": "0.5%"
+    },
+    {
+      "category": "untagged",
+      "videos": 11,
+      "totalPlays": 147464,
+      "medianPlays": 9133,
+      "avgEngagement": "4.9%",
+      "avgSaveRate": "0.2%"
+    },
+    {
+      "category": "Other",
+      "videos": 1,
+      "totalPlays": 8773,
+      "medianPlays": 8773,
+      "avgEngagement": "4.9%",
+      "avgSaveRate": "0.7%"
+    },
+    {
+      "category": "Thai Cuisine",
+      "videos": 5,
+      "totalPlays": 58174,
+      "medianPlays": 8521,
+      "avgEngagement": "4.3%",
+      "avgSaveRate": "0.5%"
+    },
+    {
+      "category": "Organization",
+      "videos": 1,
+      "totalPlays": 8141,
+      "medianPlays": 8141,
+      "avgEngagement": "3.5%",
+      "avgSaveRate": "0.5%"
+    },
+    {
+      "category": "Cafeteria",
+      "videos": 11,
+      "totalPlays": 253075,
+      "medianPlays": 7923,
+      "avgEngagement": "5.8%",
+      "avgSaveRate": "0.5%"
+    },
+    {
+      "category": "Places",
+      "videos": 3,
+      "totalPlays": 44996,
+      "medianPlays": 6762,
+      "avgEngagement": "4.7%",
+      "avgSaveRate": "0.4%"
+    },
+    {
+      "category": "Attraction",
+      "videos": 1,
+      "totalPlays": 5413,
+      "medianPlays": 5413,
+      "avgEngagement": "2.9%",
+      "avgSaveRate": "0.0%"
+    },
+    {
+      "category": "Hotel",
+      "videos": 3,
+      "totalPlays": 41452,
+      "medianPlays": 5218,
+      "avgEngagement": "7.9%",
+      "avgSaveRate": "0.4%"
+    },
+    {
+      "category": "Korean Cuisine",
+      "videos": 1,
+      "totalPlays": 4479,
+      "medianPlays": 4479,
+      "avgEngagement": "7.3%",
+      "avgSaveRate": "0.9%"
+    },
+    {
+      "category": "Home and Living",
+      "videos": 1,
+      "totalPlays": 930,
+      "medianPlays": 930,
+      "avgEngagement": "4.7%",
+      "avgSaveRate": "0.1%"
+    }
+  ],
+  "byCity": [
+    {
+      "city": "Walnut Creek",
+      "videos": 2,
+      "totalPlays": 648772,
+      "medianPlays": 639600,
+      "avgEngagement": "7.8%",
+      "avgSaveRate": "0.3%"
+    },
+    {
+      "city": "Los Gatos",
+      "videos": 1,
+      "totalPlays": 182600,
+      "medianPlays": 182600,
+      "avgEngagement": "14.0%",
+      "avgSaveRate": "0.5%"
+    },
+    {
+      "city": "San Bruno",
+      "videos": 1,
+      "totalPlays": 112200,
+      "medianPlays": 112200,
+      "avgEngagement": "9.0%",
+      "avgSaveRate": "1.3%"
+    },
+    {
+      "city": "Hayward",
+      "videos": 2,
+      "totalPlays": 109515,
+      "medianPlays": 101000,
+      "avgEngagement": "11.8%",
+      "avgSaveRate": "0.8%"
+    },
+    {
+      "city": "Santa Cruz",
+      "videos": 2,
+      "totalPlays": 136500,
+      "medianPlays": 94400,
+      "avgEngagement": "6.9%",
+      "avgSaveRate": "0.5%"
+    },
+    {
+      "city": "BOULDER",
+      "videos": 2,
+      "totalPlays": 86910,
+      "medianPlays": 81900,
+      "avgEngagement": "7.7%",
+      "avgSaveRate": "0.5%"
+    },
+    {
+      "city": "Citrus Heights",
+      "videos": 2,
+      "totalPlays": 93900,
+      "medianPlays": 81300,
+      "avgEngagement": "8.6%",
+      "avgSaveRate": "0.9%"
+    },
+    {
+      "city": "South San Francisco",
+      "videos": 3,
+      "totalPlays": 295800,
+      "medianPlays": 61800,
+      "avgEngagement": "7.2%",
+      "avgSaveRate": "0.7%"
+    },
+    {
+      "city": "Pescadero State Beach",
+      "videos": 1,
+      "totalPlays": 61500,
+      "medianPlays": 61500,
+      "avgEngagement": "6.2%",
+      "avgSaveRate": "0.3%"
+    },
+    {
+      "city": "San Jose",
+      "videos": 5,
+      "totalPlays": 267353,
+      "medianPlays": 56900,
+      "avgEngagement": "7.1%",
+      "avgSaveRate": "0.5%"
+    },
+    {
+      "city": "Daly City",
+      "videos": 1,
+      "totalPlays": 54900,
+      "medianPlays": 54900,
+      "avgEngagement": "7.8%",
+      "avgSaveRate": "0.7%"
+    },
+    {
+      "city": "Aptos",
+      "videos": 1,
+      "totalPlays": 38700,
+      "medianPlays": 38700,
+      "avgEngagement": "7.2%",
+      "avgSaveRate": "0.5%"
+    },
+    {
+      "city": "Monterey County",
+      "videos": 3,
+      "totalPlays": 119478,
+      "medianPlays": 34900,
+      "avgEngagement": "10.6%",
+      "avgSaveRate": "1.1%"
+    },
+    {
+      "city": "Davis",
+      "videos": 1,
+      "totalPlays": 31600,
+      "medianPlays": 31600,
+      "avgEngagement": "5.0%",
+      "avgSaveRate": "0.3%"
+    },
+    {
+      "city": "San Mateo",
+      "videos": 8,
+      "totalPlays": 299819,
+      "medianPlays": 27600,
+      "avgEngagement": "5.5%",
+      "avgSaveRate": "0.5%"
+    },
+    {
+      "city": "Point Reyes Station",
+      "videos": 1,
+      "totalPlays": 23100,
+      "medianPlays": 23100,
+      "avgEngagement": "5.4%",
+      "avgSaveRate": "0.3%"
+    },
+    {
+      "city": "Palo Alto",
+      "videos": 14,
+      "totalPlays": 637500,
+      "medianPlays": 20000,
+      "avgEngagement": "6.7%",
+      "avgSaveRate": "0.7%"
+    },
+    {
+      "city": "Mountain View",
+      "videos": 26,
+      "totalPlays": 1108599,
+      "medianPlays": 19300,
+      "avgEngagement": "6.7%",
+      "avgSaveRate": "0.6%"
+    },
+    {
+      "city": "Cupertino",
+      "videos": 2,
+      "totalPlays": 28900,
+      "medianPlays": 18200,
+      "avgEngagement": "6.7%",
+      "avgSaveRate": "0.4%"
+    },
+    {
+      "city": "Santa Clara",
+      "videos": 4,
+      "totalPlays": 191100,
+      "medianPlays": 17100,
+      "avgEngagement": "7.1%",
+      "avgSaveRate": "0.7%"
+    },
+    {
+      "city": "Berkeley",
+      "videos": 63,
+      "totalPlays": 2607081,
+      "medianPlays": 16900,
+      "avgEngagement": "6.5%",
+      "avgSaveRate": "0.6%"
+    },
+    {
+      "city": "Redwood City",
+      "videos": 17,
+      "totalPlays": 759228,
+      "medianPlays": 15100,
+      "avgEngagement": "6.9%",
+      "avgSaveRate": "0.5%"
+    },
+    {
+      "city": "Singapore",
+      "videos": 1,
+      "totalPlays": 14600,
+      "medianPlays": 14600,
+      "avgEngagement": "3.4%",
+      "avgSaveRate": "0.1%"
+    },
+    {
+      "city": "San Francisco",
+      "videos": 29,
+      "totalPlays": 996470,
+      "medianPlays": 13600,
+      "avgEngagement": "6.3%",
+      "avgSaveRate": "0.7%"
+    },
+    {
+      "city": "Truckee",
+      "videos": 6,
+      "totalPlays": 241531,
+      "medianPlays": 13000,
+      "avgEngagement": "4.9%",
+      "avgSaveRate": "0.4%"
+    },
+    {
+      "city": "Auburn",
+      "videos": 1,
+      "totalPlays": 12400,
+      "medianPlays": 12400,
+      "avgEngagement": "3.9%",
+      "avgSaveRate": "0.2%"
+    },
+    {
+      "city": "San Rafael",
+      "videos": 3,
+      "totalPlays": 39300,
+      "medianPlays": 11700,
+      "avgEngagement": "6.7%",
+      "avgSaveRate": "0.4%"
+    },
+    {
+      "city": "Hiroshima",
+      "videos": 2,
+      "totalPlays": 15685,
+      "medianPlays": 9458,
+      "avgEngagement": "4.6%",
+      "avgSaveRate": "0.2%"
+    },
+    {
+      "city": "Seaside",
+      "videos": 1,
+      "totalPlays": 9425,
+      "medianPlays": 9425,
+      "avgEngagement": "6.2%",
+      "avgSaveRate": "0.2%"
+    },
+    {
+      "city": "untagged",
+      "videos": 11,
+      "totalPlays": 147464,
+      "medianPlays": 9133,
+      "avgEngagement": "4.9%",
+      "avgSaveRate": "0.2%"
+    },
+    {
+      "city": "Osaka",
+      "videos": 2,
+      "totalPlays": 14002,
+      "medianPlays": 8256,
+      "avgEngagement": "4.4%",
+      "avgSaveRate": "0.1%"
+    },
+    {
+      "city": "Shinjuku City",
+      "videos": 1,
+      "totalPlays": 7659,
+      "medianPlays": 7659,
+      "avgEngagement": "6.2%",
+      "avgSaveRate": "0.2%"
+    },
+    {
+      "city": "",
+      "videos": 3,
+      "totalPlays": 44996,
+      "medianPlays": 6762,
+      "avgEngagement": "4.7%",
+      "avgSaveRate": "0.4%"
+    },
+    {
+      "city": "New York",
+      "videos": 8,
+      "totalPlays": 60228,
+      "medianPlays": 5847,
+      "avgEngagement": "3.9%",
+      "avgSaveRate": "0.2%"
+    },
+    {
+      "city": "Hatsukaichi",
+      "videos": 1,
+      "totalPlays": 5218,
+      "medianPlays": 5218,
+      "avgEngagement": "4.6%",
+      "avgSaveRate": "0.3%"
+    },
+    {
+      "city": "Ota City",
+      "videos": 1,
+      "totalPlays": 4921,
+      "medianPlays": 4921,
+      "avgEngagement": "3.2%",
+      "avgSaveRate": "0.1%"
+    },
+    {
+      "city": "Gombak District",
+      "videos": 1,
+      "totalPlays": 4669,
+      "medianPlays": 4669,
+      "avgEngagement": "3.9%",
+      "avgSaveRate": "0.1%"
+    },
+    {
+      "city": "Chicago",
+      "videos": 33,
+      "totalPlays": 267985,
+      "medianPlays": 4431,
+      "avgEngagement": "3.7%",
+      "avgSaveRate": "0.3%"
+    },
+    {
+      "city": "Park City",
+      "videos": 1,
+      "totalPlays": 3508,
+      "medianPlays": 3508,
+      "avgEngagement": "2.1%",
+      "avgSaveRate": "0.1%"
+    },
+    {
+      "city": "Los Angeles County",
+      "videos": 1,
+      "totalPlays": 1334,
+      "medianPlays": 1334,
+      "avgEngagement": "4.6%",
+      "avgSaveRate": "0.2%"
+    },
+    {
+      "city": "East Los Angeles",
+      "videos": 5,
+      "totalPlays": 18062,
+      "medianPlays": 1135,
+      "avgEngagement": "5.5%",
+      "avgSaveRate": "0.2%"
+    }
+  ],
+  "topBySaves": [
+    {
+      "place": "Nabolom Bakery - Pizzeria.",
+      "saveRate": "2.9%",
+      "plays": 17400
+    },
+    {
+      "place": "Il Canto Cafe",
+      "saveRate": "2.8%",
+      "plays": 41200
+    },
+    {
+      "place": "Taqueria El Paisa",
+      "saveRate": "2.7%",
+      "plays": 69200
+    },
+    {
+      "place": "House Of Xian Dumpling",
+      "saveRate": "2.3%",
+      "plays": 352200
+    },
+    {
+      "place": "La Mia Cucina",
+      "saveRate": "2.1%",
+      "plays": 76100
+    }
+  ]
+}
