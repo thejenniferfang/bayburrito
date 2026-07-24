@@ -82,6 +82,19 @@ export const BURRITOS: Burrito[] = [
     "plays": 35800
   },
   {
+    "id": "hook-fish-co",
+    "name": "Burrito",
+    "taqueria": "Hook Fish Co.",
+    "neighborhood": "San Francisco",
+    "tier": "A",
+    "fluffieNotes": "hook fish co is not overrated but money talks",
+    "lat": 37.76239,
+    "lng": -122.50686,
+    "imgUrl": "/images/burritos/hook-fish-co.jpg",
+    "videoUrl": "https://www.tiktok.com/@fluffie.donut/video/7655795314971905310",
+    "plays": 10800
+  },
+  {
     "id": "spartan-taco-truck",
     "name": "Burrito",
     "taqueria": "Spartan Taco Truck",
