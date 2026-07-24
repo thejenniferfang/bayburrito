@@ -272,9 +272,10 @@ function SusanItem({
     // its neighbours (sharper = neighbours fall away faster)
     const bump = Math.exp(-((tw / 0.28) ** 2));
     const lift = R + 55 * bump; // apex eases outward off the rim, standing proud
-    // push the apex's immediate neighbours sideways so the hero card gets
-    // clear horizontal breathing room (0 at the apex, peaks either side)
-    const spread = Math.sign(Math.sin(tw)) * itemW * 0.55 * bump;
+    // push the apex's neighbours sideways so the hero card gets clear
+    // horizontal breathing room. Use sin(tw) (smooth, 0 at the apex) rather
+    // than sign(sin) which jumps the centred card sideways on tiny offsets.
+    const spread = Math.sin(tw) * itemW * 2.2 * bump;
     const x = Math.sin(tw) * lift + spread;
     const y = -Math.cos(tw) * lift;
     const scale = 0.6 + 0.66 * bump;

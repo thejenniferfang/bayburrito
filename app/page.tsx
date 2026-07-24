@@ -14,7 +14,7 @@ import { initAudio } from "@/lib/audio";
 export default function Home() {
   // null = not yet known (avoids a hydration flash), then true/false
   const [fed, setFed] = useState<boolean | null>(null);
-  const [view, setView] = useState<ViewKey>("susan");
+  const [view, setView] = useState<ViewKey>("tiers");
   const [activeIndex, setActiveIndex] = useState(0);
 
   useEffect(() => {
